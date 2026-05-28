@@ -7,3 +7,4 @@ project_*
 **/.Xil
 *.mif
 *.dmp
+*.log
