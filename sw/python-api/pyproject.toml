@@ -1,0 +1,11 @@
+[project]
+name = "python-api"
+version = "0.1.0"
+description = "Python API for NSIL's (IAEA) DPP4SiPM MCA board"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fixedpoint>=1.0.1",
+    "numpy>=2.4.6",
+    "pyserial>=3.5",
+]
