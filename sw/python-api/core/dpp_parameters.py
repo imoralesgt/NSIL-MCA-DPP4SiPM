@@ -1425,7 +1425,8 @@ class Dpp_Variable_Gain_Amplifier:
     #: Common fields across all board revisions, used to generically validate settings
     VALID_VERSIONS = ('A', 'B')
     GAIN_FINE_LIMITS = (1.0, 2.0)
-    GAIN_COARSE_LIMITS = (0.5, 5.0)
+    GAIN_COARSE_LIMITS_A = (1.0, 1.0) # No coarse gain tuning available in board Version A
+    GAIN_COARSE_LIMITS_B = (1.0, 21.0)
     NAME_FIELD = 'NAME'
     DAC_RES_FIELD = 'DAC_RES'
     V_REF_FIELD = 'V_REF'
@@ -1470,7 +1471,7 @@ class Dpp_Variable_Gain_Amplifier:
 
         self.version = self.__validate_version(board_version)
         self.gain_fine = self.__validate_gain_fine(gain_fine) 
-        self.gain_coarse = self.__validate_gain_coarse(gain_coarse)
+        self.gain_coarse = self.__validate_gain_coarse(gain_coarse, board_version)
 
         self.r1_gain_fine_32_0 = self._compute_r1_gain_fine()
         self.r2_gain_coarse_32_0 = self._compute_r2_gain_coarse()
@@ -1502,7 +1503,7 @@ class Dpp_Variable_Gain_Amplifier:
         
         board_settings = self.__lookup_board_settings(self.version)
 
-        gain_fine = self.__compute_gain_dac(
+        gain_fine = self.__compute_fine_gain_dac(
             gain = self.gain_fine,
             dac_resolution = board_settings[self.DAC_RES_FIELD],
             ref_voltage = board_settings[self.V_REF_FIELD]
@@ -1521,22 +1522,22 @@ class Dpp_Variable_Gain_Amplifier:
         
         board_settings = self.__lookup_board_settings(self.version)
 
-        gain_coarse = self.__compute_gain_dac(
+        gain_coarse = self.__compute_coarse_gain_dac(
             gain = self.gain_coarse,
             dac_resolution = board_settings[self.DAC_RES_FIELD],
-            ref_voltage = board_settings[self.V_REF_FIELD]
+            ref_voltage = board_settings[self.V_REF_FIELD],
+            board_version = board_settings[self.NAME_FIELD],
         )
 
         return FixedPoint_Bin(gain_coarse, False, 32, 0)
 
 
-    def __compute_gain_dac(self,
+    def __compute_fine_gain_dac(self,
                         gain : float,
                         dac_resolution : int,
                         ref_voltage : float,
                         ) -> int:
-        """
-        Generic method to compute the DAC value for the given gain. Can
+        """Generic method to compute the DAC value for the given gain. Can
         be resused among the different board revisions.
 
         Args:
@@ -1552,6 +1553,33 @@ class Dpp_Variable_Gain_Amplifier:
 
         y = gain*(2**dac_resolution)/(2*ref_voltage) + OFFSET
         y = int(y)
+
+        return y
+    
+    def __compute_coarse_gain_dac(self,
+                        gain : float,
+                        dac_resolution : int,
+                        ref_voltage : float,
+                        board_version : str,):
+        """Generic method to compute the DAC value for the given gain. Can
+        be reused among different board versions, except for revision A (no coarse gain).
+
+        Args:
+            gain (float): Expected gain value
+            dac_resolution (int): DAC resolution
+            ref_voltage (float): Reference voltage
+            board_version (str): Board revision/version
+        """
+
+        # No coarse gain is available in board revision A
+        if board_version == 'A':
+            return int(self.GAIN_COARSE_LIMITS_A[1])
+        
+        OFFSET = 0.5 ## Quantization offset
+        
+        # See documentation for further details on this equation
+        y = 0.6*(2**dac_resolution)*np.log10(gain)/ref_voltage
+        y = int(y + OFFSET)
 
         return y
     
@@ -1616,12 +1644,13 @@ class Dpp_Variable_Gain_Amplifier:
         
         return gain_fine
     
-    def __validate_gain_coarse(self, gain_coarse : float) -> float:
+    def __validate_gain_coarse(self, gain_coarse : float, board_version : str) -> float:
         """
         Validates the coarse gain setting to be within the expected range.
 
         Args:
             gain_coarse (float): Gain coarse
+            board_version (str): Board revision/version
 
         Returns:
             float: Validated coarse gain 
@@ -1629,11 +1658,15 @@ class Dpp_Variable_Gain_Amplifier:
         Raises:
             ValueError: If the coarse gain is not within the expected range
         """
-        min_gain = self.GAIN_COARSE_LIMITS[0]
-        max_gain = self.GAIN_COARSE_LIMITS[1]
+        if board_version == "A":
+            min_gain = self.GAIN_COARSE_LIMITS_A[0]
+            max_gain = self.GAIN_COARSE_LIMITS_A[1]
+        else:
+            min_gain = self.GAIN_COARSE_LIMITS_B[0]
+            max_gain = self.GAIN_COARSE_LIMITS_B[1]       
 
         if gain_coarse < min_gain or gain_coarse > max_gain:
-            raise ValueError(f"VGA coarse gain must be between {min_gain} and {max_gain}.")
+            raise ValueError(f"VGA coarse gain for board version {board_version} must be between {min_gain} and {max_gain}.")
         
         return gain_coarse
     
@@ -2147,11 +2180,10 @@ if __name__ == '__main__':
     TIMERS_B_CLEAR = False #: Reset timer B before starting
     TIMERS_C_CLEAR = False #: Reset timer C before starting
     HIGH_VOLTAGE = 0 #: High voltage for PMT (in Volts)
-    VGA_VERSION = 'B' #: Version/revision of the board. Valid values: A, B (string)
+    VGA_BOARD_VERSION = 'B' #: Version/revision of the board. Valid values: A, B (string)
     VGA_GAIN_FINE = 1.0 #: Fine gain of the variable-gain amplifier in the AFE (before ADC)
-    VGA_GAIN_COARSE = 1.0 #: Coarse gain of the variable-gain amplifier in the AFE (before ADC)
+    VGA_GAIN_COARSE = 5.0 #: Coarse gain of the variable-gain amplifier in the AFE (before ADC)
     
-
 
     # Initializing the DPP parameters class instance
     dpp_parameters = Dpp_Parameters(
@@ -2206,7 +2238,7 @@ if __name__ == '__main__':
         timers_b_clear=TIMERS_B_CLEAR,
         timers_c_clear=TIMERS_C_CLEAR,
         high_voltage=HIGH_VOLTAGE,
-        vga_board_version=VGA_VERSION,
+        vga_board_version=VGA_BOARD_VERSION,
         vga_gain_fine=VGA_GAIN_FINE,
         vga_gain_coarse=VGA_GAIN_COARSE
     )
