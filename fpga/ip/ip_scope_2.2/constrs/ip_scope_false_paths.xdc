@@ -1,0 +1,7 @@
+set_false_path -through [get_pins ip_scope_struct/register_x0/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register1/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register2/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register3/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register4/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register5/synth_reg_inst_0/o]
+set_false_path -through [get_pins ip_scope_struct/register6/synth_reg_inst_0/o]

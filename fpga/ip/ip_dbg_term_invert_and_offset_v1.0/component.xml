@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>iaea.org</spirit:vendor>
+  <spirit:library>user</spirit:library>
+  <spirit:name>ip_dbg_term_invert_and_offset</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:busInterfaces>
+    <spirit:busInterface>
+      <spirit:name>dbg_invert_and_offset_m0</spirit:name>
+      <spirit:busType spirit:vendor="iaea.org" spirit:library="interface" spirit:name="dbg_invert_and_offset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="iaea.org" spirit:library="interface" spirit:name="dbg_invert_and_offset_rtl" spirit:version="1.0"/>
+      <spirit:master/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>outp</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>outp_out</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>adc_data</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>adc_data_out</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+  </spirit:busInterfaces>
+  <spirit:model>
+    <spirit:views>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagesynthesis</spirit:name>
+        <spirit:displayName>Synthesis</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>top</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagesynthesis_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>612a8956</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagebehavioralsimulation</spirit:name>
+        <spirit:displayName>Simulation</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>top</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>612a8956</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_xpgui</spirit:name>
+        <spirit:displayName>UI Layout</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:xgui.ui</spirit:envIdentifier>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_xpgui_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>f64a5dae</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+    </spirit:views>
+    <spirit:ports>
+      <spirit:port>
+        <spirit:name>adc_data_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">15</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>outp_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">15</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+    </spirit:ports>
+  </spirit:model>
+  <spirit:fileSets>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagesynthesis_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>src/top.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_612a8956</spirit:userFileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>src/top.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>xgui/ip_dbg_term_invert_and_offset_v1_0.tcl</spirit:name>
+        <spirit:fileType>tclSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_f64a5dae</spirit:userFileType>
+        <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+  </spirit:fileSets>
+  <spirit:description>ip_dbg_term_invert_and_offset_v1_0</spirit:description>
+  <spirit:parameters>
+    <spirit:parameter>
+      <spirit:name>Component_Name</spirit:name>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">top_v1_0</spirit:value>
+    </spirit:parameter>
+  </spirit:parameters>
+  <spirit:vendorExtensions>
+    <xilinx:coreExtensions>
+      <xilinx:supportedFamilies>
+        <xilinx:family xilinx:lifeCycle="Production">artix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">artix7l</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">aartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">zynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qzynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">azynq</xilinx:family>
+      </xilinx:supportedFamilies>
+      <xilinx:taxonomies>
+        <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
+      </xilinx:taxonomies>
+      <xilinx:displayName>ip_dbg_term_invert_and_offset_v1_0</xilinx:displayName>
+      <xilinx:definitionSource>package_project</xilinx:definitionSource>
+      <xilinx:coreRevision>3</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-01-27T11:35:23Z</xilinx:coreCreationDateTime>
+      <xilinx:tags>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d8517d7_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3434ee37_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e61dc9d_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6f8e71fc_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7c61e763_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12a6df6e_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@759bdfdd_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@271fa245_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d208bb9_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cfbd37a_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@13c289df_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@28131442_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e5f78d9_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f856594_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62d4d79d_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@480e2db4_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a22552c_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ff326cc_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@daaf772_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36bfa73a_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2796affe_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ab2ca0b_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6954b476_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ec55a8b_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40b57d36_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ea8ad37_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@619ced18_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6dee483a_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6928fa2e_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@659642d8_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a1c2371_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11c7cc7e_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@10d65909_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5872cb1a_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a4a4754_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23a091d6_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e20992f_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16bfcd9b_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e7901e_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eb6cb52_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5573f7c5_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36e3ea2b_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cc6a9cb_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47143654_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e461072_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1116010b_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e02d45c_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@34c28251_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1370d1d4_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@675be13c_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23f89e71_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7525c7f0_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@416e6da2_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d14e91c_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@108f08bf_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bfa9607_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@463b0621_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4759e5_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22d4f52f_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59820558_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30c0267f_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6193d5ab_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1226d353_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1bd38d8e_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c296eb8_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@43240f32_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ad125e7_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58f36703_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@148d23bb_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ce53d30_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f627eb0_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40200d5_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d6dea5c_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23dca26a_ARCHIVE_LOCATION">e:/iprepo/ip_dbg_term_invert_and_offset_v1.0</xilinx:tag>
+      </xilinx:tags>
+    </xilinx:coreExtensions>
+    <xilinx:packagingInfo>
+      <xilinx:xilinxVersion>2018.3</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="1fe089c2"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="d74f4b62"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="383ebc6c"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="e1efc7d9"/>
+    </xilinx:packagingInfo>
+  </spirit:vendorExtensions>
+</spirit:component>

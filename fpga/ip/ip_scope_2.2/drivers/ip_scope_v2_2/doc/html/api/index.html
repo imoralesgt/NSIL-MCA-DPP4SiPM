@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<style type="text/css">
+body {margin-top:6.35em; 
+      margin-left:6.35em; 
+      width:62.5em;
+      text-align:justify;
+      font-size:1em; 
+      font-family:"Arial", Serif;
+      color:#000000;}
+
+h1 {font-size:1.125em;
+    font-family:"Arial", Sans-serif;
+    color:#943634;}
+
+p {font-size:inherit;
+   width:62.5em;
+   font-family:inherit;
+   color:inherit;}
+
+ul {font-size:inherit;
+    width:62.5em;
+    font-family:inherit;
+    color:inherit;}
+
+li {width:46.15em;}
+
+.image {position: relative;
+        width: 100%;}
+
+table {border-collapse:collapse;
+       border-spacing:0;
+       caption-side:bottom;
+       border-style:solid;
+       border-width:thin;
+       font-size:1em;
+       width:62.5em;
+       font-family:inherit;
+       color:inherit;}
+
+.title_table {border-collapse:collapse;
+       border-spacing:0;
+       caption-side:bottom;
+       font-size:1em;
+       width:62.5em;
+       border-style:none;}
+
+.title_table_image_cell {border-bottom:thin solid #000000;}
+
+.title_table_design_cell {vertical-align:bottom;
+        font-size:1.875em;
+        text-align:right;
+        border-bottom:thin solid #000000;}
+
+.title_table_date_cell{font-size:1.25em;
+        vertical-align:bottom;
+        text-align:left;
+        border-bottom:thick solid #943634}
+
+.sg_row {font-size:inherit;
+         font-family:inherit;
+         color:inherit;
+         border-style:solid;
+         border-width:thin;}
+
+.sg_cell {margin:0;
+          padding:1em;
+          border-width:inherit;
+          border-style:inherit;
+          font-size:inherit;
+          font-family:inherit;
+          color:inherit;}
+
+.sg_cell_first_row {margin:0;
+          padding:1em;
+          border-width:inherit;
+          border-style:inherit;
+          border-bottom:thick solid #943634;
+          font-size:inherit;
+          font-family:inherit;
+          color:inherit;}
+
+.sg_caption {text-align:left;
+             caption-side:bottom;
+             font-family:inherit;
+             font-size:inherit;}
+</style>
+</head>
+<body>
+<table class="title_table">
+<tr>
+<td class="title_table_image_cell"></td>
+<td class="title_table_design_cell">ip_scope</td>
+</tr>
+<tr>
+<td colspan=2 class="title_table_date_cell"><b></b></td>
+</tr>
+</table>
+<h1>int ip_scope_Initialize(ip_scope* InstancePtr, u16 DeviceId)</h1>
+<p>
+Initialize ip_scope pointer with a specifc instance of the device based device id.
+<br/>
+  @param InstancePtr to be initialized
+<br/>
+  @param DeviceId device id assigned to the device in xparameters.h
+<br/>
+<br/>
+  @return int XST_SUCCESS if initialization is successful
+<br/>
+</p>
+<h1>void ip_scope_r9_down_sample_rate_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r9_down_sample_rate gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r9_down_sample_rate instance to operate on.<br/>
+ @param	Data is value to be written to gateway r9_down_sample_rate.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r9_down_sample_rate_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r9_down_sample_rate gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r9_down_sample_rate instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r7_clear_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r7_clear gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r7_clear instance to operate on.<br/>
+ @param	Data is value to be written to gateway r7_clear.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r7_clear_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r7_clear gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r7_clear instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r6_delay_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r6_delay gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r6_delay instance to operate on.<br/>
+ @param	Data is value to be written to gateway r6_delay.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r6_delay_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r6_delay gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r6_delay instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r5_enable_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r5_enable gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r5_enable instance to operate on.<br/>
+ @param	Data is value to be written to gateway r5_enable.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r5_enable_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r5_enable gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r5_enable instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r4_threshold_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r4_threshold gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r4_threshold instance to operate on.<br/>
+ @param	Data is value to be written to gateway r4_threshold.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r4_threshold_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r4_threshold gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r4_threshold instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r3_dina_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r3_dina gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r3_dina instance to operate on.<br/>
+ @param	Data is value to be written to gateway r3_dina.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r3_dina_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r3_dina gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r3_dina instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r2_wea_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r2_wea gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r2_wea instance to operate on.<br/>
+ @param	Data is value to be written to gateway r2_wea.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r2_wea_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r2_wea gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r2_wea instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r1_addra_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r1_addra gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r1_addra instance to operate on.<br/>
+ @param	Data is value to be written to gateway r1_addra.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r1_addra_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r1_addra gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r1_addra instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r11_trigger_mode_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r11_trigger_mode gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r11_trigger_mode instance to operate on.<br/>
+ @param	Data is value to be written to gateway r11_trigger_mode.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r11_trigger_mode_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r11_trigger_mode gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r11_trigger_mode instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>void ip_scope_r10_sample_mode_write(ip_scope *InstancePtr, u32 Data);</h1>
+<p>
+ Write to r10_sample_mode gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r10_sample_mode instance to operate on.<br/>
+ @param	Data is value to be written to gateway r10_sample_mode.<br/>
+<br/>
+ @return	None.<br/>
+<br/>
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r10_sample_mode_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r10_sample_mode gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r10_sample_mode instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r12_douta_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r12_douta gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r12_douta instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+<h1>u32 ip_scope_r8_full_read(ip_scope *InstancePtr);</h1>
+<p>
+ Read from r8_full gateway of ip_scope. Assignments are LSB-justified.<br/>
+<br/>
+ @param	InstancePtr is the r8_full instance to operate on.<br/>
+<br/>
+ @return	u32<br/>
+
+ @note    .<br/>
+<br/>
+</p>
+</body>
+</html>

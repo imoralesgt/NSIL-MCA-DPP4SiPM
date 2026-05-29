@@ -1,0 +1,9 @@
+# Vivado-related non-traceable sources
+project_*
+*.jou
+*.str
+.Xil/**
+**/.Xil
+*.mif
+*.dmp
+*.log

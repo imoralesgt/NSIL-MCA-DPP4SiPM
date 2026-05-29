@@ -1,0 +1,10 @@
+
+
+OPTION psf_version = 2.1;
+
+BEGIN DRIVER dpp_iface
+	OPTION supported_peripherals = (dpp_iface);
+	OPTION copyfiles = all;
+	OPTION VERSION = 1.0;
+	OPTION NAME = dpp_iface;
+END DRIVER

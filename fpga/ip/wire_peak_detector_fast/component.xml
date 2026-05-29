@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>iaea.org</spirit:vendor>
+  <spirit:library>user</spirit:library>
+  <spirit:name>wire_peak_detector_fast</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:busInterfaces>
+    <spirit:busInterface>
+      <spirit:name>peak_detector_fast</spirit:name>
+      <spirit:busType spirit:vendor="iaea.org" spirit:library="interface" spirit:name="peak_detector_fast" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="iaea.org" spirit:library="interface" spirit:name="peak_detector_fast_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>r3_xmin</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>r3_xmin</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>r2_time_over_threshold</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>r2_time_over_threshold</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>r1_blanking_time</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>r1_blanking_time</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>r4_xmax</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>r4_xmax</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>r5_flags</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>r5_flags</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+  </spirit:busInterfaces>
+  <spirit:model>
+    <spirit:views>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagesynthesis</spirit:name>
+        <spirit:displayName>Synthesis</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>top</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagesynthesis_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>addd2b26</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_anylanguagebehavioralsimulation</spirit:name>
+        <spirit:displayName>Simulation</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
+        <spirit:language>VHDL</spirit:language>
+        <spirit:modelName>top</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>addd2b26</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_xpgui</spirit:name>
+        <spirit:displayName>UI Layout</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:xgui.ui</spirit:envIdentifier>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_xpgui_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>viewChecksum</spirit:name>
+            <spirit:value>f64a5dae</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+    </spirit:views>
+    <spirit:ports>
+      <spirit:port>
+        <spirit:name>r1_blanking_time</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r2_time_over_threshold</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r3_xmin</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r4_xmax</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
+          </spirit:driver>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r5_flags</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r1_blanking_time_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r2_time_over_threshold_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r3_xmin_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r4_xmax_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>r5_flags_out</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>STD_LOGIC_VECTOR</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+    </spirit:ports>
+  </spirit:model>
+  <spirit:fileSets>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagesynthesis_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>src/top.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_addd2b26</spirit:userFileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>src/top.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>xgui/wire_peak_detector_fast_v1_0.tcl</spirit:name>
+        <spirit:fileType>tclSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_f64a5dae</spirit:userFileType>
+        <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
+  </spirit:fileSets>
+  <spirit:description>wire_peak_detector_fast</spirit:description>
+  <spirit:parameters>
+    <spirit:parameter>
+      <spirit:name>Component_Name</spirit:name>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">top_v1_0</spirit:value>
+    </spirit:parameter>
+  </spirit:parameters>
+  <spirit:vendorExtensions>
+    <xilinx:coreExtensions>
+      <xilinx:supportedFamilies>
+        <xilinx:family xilinx:lifeCycle="Production">artix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">artix7l</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">aartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qartix7</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">zynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">qzynq</xilinx:family>
+        <xilinx:family xilinx:lifeCycle="Production">azynq</xilinx:family>
+      </xilinx:supportedFamilies>
+      <xilinx:taxonomies>
+        <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
+      </xilinx:taxonomies>
+      <xilinx:displayName>wire_peak_detector_fast</xilinx:displayName>
+      <xilinx:definitionSource>package_project</xilinx:definitionSource>
+      <xilinx:coreRevision>1</xilinx:coreRevision>
+      <xilinx:upgrades>
+        <xilinx:canUpgradeFrom>xilinx.com:user:top:1.0</xilinx:canUpgradeFrom>
+        <xilinx:canUpgradeFrom>xilinx.com:user:wire_peak_detector_fast:1.0</xilinx:canUpgradeFrom>
+      </xilinx:upgrades>
+      <xilinx:coreCreationDateTime>2026-04-01T14:57:40Z</xilinx:coreCreationDateTime>
+      <xilinx:tags>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@63c1d06b_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20a100d0_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c84d331_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4fb52494_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@342f32ac_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@cda71f3_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ad4c4ab_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69fc7b23_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2fec36d6_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ff595b7_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f9f1f04_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e69231a_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39347e94_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9930f8a_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d3a509c_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6caee949_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73284176_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16c60169_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@38d6e128_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c558376_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b0d6188_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21ed3020_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4e287ced_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@791af4b6_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61395058_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1bf2e548_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@276ea958_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a10146c_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@706e1e98_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a7bdbe4_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4533623f_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5eb48ed9_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39e5017a_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a4ebed5_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58ec0103_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@33dd0ffb_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c8cf2bd_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ca42323_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20f2a70e_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61b974ab_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ce5135_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b0d305f_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5367f6c0_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@10b60264_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f9b6ae_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58f131cb_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b353285_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@657c2069_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11686989_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40a7fac8_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@93a6777_ARCHIVE_LOCATION">c:/smr3562/iaea/xilinx/ip/wire_peak_detector_fast</xilinx:tag>
+      </xilinx:tags>
+    </xilinx:coreExtensions>
+    <xilinx:packagingInfo>
+      <xilinx:xilinxVersion>2022.2</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="48032a83"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="cd99519d"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="95ce1424"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="e1efc7d9"/>
+    </xilinx:packagingInfo>
+  </spirit:vendorExtensions>
+</spirit:component>
