@@ -1,5 +1,4 @@
 # Vivado-related non-traceable sources
-projects/*
 project_*
 *.jou
 *.str
