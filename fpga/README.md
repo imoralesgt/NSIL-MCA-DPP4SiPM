@@ -44,7 +44,7 @@ This step will guide you through the steps required to compile the MicroBlaze fi
 1. Launch Vitis and setup a new workspace. Use the `fpga/projects` folder to create it. The name ought to start with the preffix **project_** to be compatible with the repository structure. For example: **project_dpp_sw**.
 > Do not use the same folder reserved for the Vivado project.
 2. Create a New Application project in Vitis.
-3. Import the XSA hardware definition file (see Step 18. from [FPGA design](#fpga-design). Alternatively, you can also import the previously-exported file in the repository: `fpga/bitstream/design_1_wrapper.xsa`.
+3. Import the XSA hardware definition file (see Step 18. from [FPGA design](#fpga-design)). Alternatively, you can also import the previously-exported file in the repository: `fpga/bitstream/design_1_wrapper.xsa`.
 4. Set the application name in the project wizard and click Next. The name can be something like **dpp_app**.
 5. In the domain step, choose **standalone** as the Operating System, and leave *microblaze_0* as the Processor. Click Next.
 6. In the templates step, choose **Empty Application (C)**. Click Finish. A new project has just been created.
