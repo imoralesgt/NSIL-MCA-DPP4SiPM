@@ -7,6 +7,7 @@ class DaqHw(Serial):
     #: Use these default values for the USB-UART FTDI chip in the CMOD A7 board
     DEFAULT_VID = "0403"
     DEFAULT_PID = "6010"
+    DEFAULT_BAUDRATE = 115200
 
     def _disregard_jtag(self):
         """
@@ -128,12 +129,9 @@ if __name__ == "__main__":
     ## This is a validation code that should not be run in production
     daq = DaqHw()
 
-    ## Taking the default VID and PID for the CMOD A7 development board
-    vid = daq.DEFAULT_VID
-    pid = daq.DEFAULT_PID
-
     ## Finding the port corresponding to the device we are looking for
-    port_name = daq.find_port(vid, pid)
+    ## Taking the default VID and PID for the CMOD A7 development board
+    port_name = daq.find_port(daq.DEFAULT_VID, daq.DEFAULT_PID)
     print(f"DAQ found in port: {port_name}")
 
     ## Checking if the port can be opened and closed
