@@ -1677,7 +1677,7 @@ class Dpp_Variable_Gain_Amplifier:
         return self.__str__()
         
 
-class Dpp_Parameters:
+class DppParameters:
     def __init__(self, sampling_rate : float,
                  tau_d : float,
                  tau_r : float,
