@@ -2140,7 +2140,7 @@ if __name__ == '__main__':
     POLES = 2   #: Number of poles in the pulse shaper filter (SiPM: 2, PMT: 3)
     SHAPER_S_GAIN = 1.0 #: Digital gain of the slow pulse shaper filter
     SHAPER_F_GAIN = 1.0 #: Digital gain of the fast pulse shaper filter
-    DC_OFFSET = -0.77 #: ADC input signal DC offset (in Volts)
+    DC_OFFSET = -0.03 #: ADC input signal DC offset (in Volts)
     INVERT_PULSE = False #: Is the original pulse inverted before shaping?
     SMOOTHING_FACTOR = 2 # Moving averaging Formatter flags (1, 2, 4, or 8)
     BLR_S_THRESHOLD_HIGH = 0.00 #: BLR slow clamping threshold high (in Volts)
