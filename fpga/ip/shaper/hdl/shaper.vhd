@@ -19,17 +19,17 @@ entity shaper_axi_clk_domain is
   );
 end shaper_axi_clk_domain;
 architecture structural of shaper_axi_clk_domain is 
-  signal r10_flags_net : std_logic_vector( 32-1 downto 0 );
-  signal r6_dc_offset_1_net : std_logic_vector( 32-1 downto 0 );
-  signal r5_b20_net : std_logic_vector( 32-1 downto 0 );
-  signal r7_b2_net : std_logic_vector( 32-1 downto 0 );
   signal r4_nb_net : std_logic_vector( 32-1 downto 0 );
-  signal r1_b10_net : std_logic_vector( 32-1 downto 0 );
-  signal r11_dc_offset_2_net : std_logic_vector( 32-1 downto 0 );
-  signal r3_na_net : std_logic_vector( 32-1 downto 0 );
+  signal r5_b20_net : std_logic_vector( 32-1 downto 0 );
+  signal r6_dc_offset_1_net : std_logic_vector( 32-1 downto 0 );
   signal r8_b1_net : std_logic_vector( 32-1 downto 0 );
+  signal r7_b2_net : std_logic_vector( 32-1 downto 0 );
   signal r9_aa20_net : std_logic_vector( 32-1 downto 0 );
+  signal r11_dc_offset_2_net : std_logic_vector( 32-1 downto 0 );
   signal r2_na_inv_net : std_logic_vector( 32-1 downto 0 );
+  signal r1_b10_net : std_logic_vector( 32-1 downto 0 );
+  signal r10_flags_net : std_logic_vector( 32-1 downto 0 );
+  signal r3_na_net : std_logic_vector( 32-1 downto 0 );
 begin
   r10_flags_net <= r10_flags;
   r11_dc_offset_2_net <= r11_dc_offset_2;
@@ -58,14 +58,14 @@ entity shaper_normalization1 is
   );
 end shaper_normalization1;
 architecture structural of shaper_normalization1 is 
-  signal ce_net : std_logic;
-  signal convert_dout_net : std_logic_vector( 36-1 downto 0 );
-  signal clk_net : std_logic;
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal delay_q_net : std_logic_vector( 18-1 downto 0 );
+  signal convert_dout_net : std_logic_vector( 36-1 downto 0 );
   signal register2_q_net : std_logic_vector( 32-1 downto 0 );
+  signal clk_net : std_logic;
   signal mult_p_net : std_logic_vector( 18-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   out1 <= delay_q_net;
   convert_dout_net <= in1;
@@ -159,22 +159,21 @@ entity shaper_overflow is
   );
 end shaper_overflow;
 architecture structural of shaper_overflow is 
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 16-1 downto 0 );
   signal mux_y_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
+  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal constant1_op_net : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 16-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 16-1 downto 0 );
-  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   of_x0 <= relational_op_net;
   mcode_y_net <= x;
   slice_y_net <= en;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  constant_x0 : entity xil_defaultlib.sysgen_constant_08104d262e 
+  constant_x0 : entity xil_defaultlib.sysgen_constant_05b3186a9b 
   port map (
     clk => '0',
     ce => '0',
@@ -201,26 +200,11 @@ begin
   relational : entity xil_defaultlib.sysgen_relational_ed701c3806 
   port map (
     clr => '0',
-    a => delay_q_net,
+    a => mcode_y_net,
     b => mux_y_net,
     clk => clk_net,
     ce => ce_net,
     op => relational_op_net
-  );
-  delay : entity xil_defaultlib.shaper_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 16
-  )
-  port map (
-    en => '1',
-    rst => '0',
-    d => mcode_y_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => delay_q_net
   );
 end structural;
 -- Generated from Simulink block shaper/filter_clk_domain/Filter/bipolar/delayLine
@@ -238,17 +222,17 @@ entity shaper_delayline is
   );
 end shaper_delayline;
 architecture structural of shaper_delayline is 
-  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
-  signal add_s_net : std_logic_vector( 10-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal single_port_ram_data_out_net : std_logic_vector( 24-1 downto 0 );
   signal counter_op_net : std_logic_vector( 10-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 10-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 10-1 downto 0 );
-  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 10-1 downto 0 );
+  signal add_s_net : std_logic_vector( 10-1 downto 0 );
   signal constant1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
+  signal ce_net : std_logic;
+  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal constant_op_net : std_logic_vector( 10-1 downto 0 );
 begin
   dout <= single_port_ram_data_out_net;
   subtractor_s_net <= din;
@@ -353,14 +337,14 @@ entity shaper_bipolar is
   );
 end shaper_bipolar;
 architecture structural of shaper_bipolar is 
-  signal sub_s_net : std_logic_vector( 16-1 downto 0 );
+  signal add_s_net : std_logic_vector( 10-1 downto 0 );
   signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
+  signal single_port_ram_data_out_net : std_logic_vector( 24-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
   signal clk_net : std_logic;
+  signal sub_s_net : std_logic_vector( 16-1 downto 0 );
   signal register4_q_net : std_logic_vector( 32-1 downto 0 );
   signal ce_net : std_logic;
-  signal single_port_ram_data_out_net : std_logic_vector( 24-1 downto 0 );
-  signal add_s_net : std_logic_vector( 10-1 downto 0 );
 begin
   y <= sub_s_net;
   subtractor_s_net <= x;
@@ -444,7 +428,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity shaper_delayline_x1 is
+entity shaper_delayline_x0 is
   port (
     din : in std_logic_vector( 36-1 downto 0 );
     addr : in std_logic_vector( 10-1 downto 0 );
@@ -452,19 +436,19 @@ entity shaper_delayline_x1 is
     ce_1 : in std_logic;
     dout : out std_logic_vector( 36-1 downto 0 )
   );
-end shaper_delayline_x1;
-architecture structural of shaper_delayline_x1 is 
-  signal reinterpret3_output_port_net : std_logic_vector( 10-1 downto 0 );
-  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 1-1 downto 0 );
+end shaper_delayline_x0;
+architecture structural of shaper_delayline_x0 is 
   signal single_port_ram_data_out_net : std_logic_vector( 36-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 10-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 10-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
   signal accumulator_q_net : std_logic_vector( 36-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 10-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal constant_op_net : std_logic_vector( 10-1 downto 0 );
+  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal constant1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 10-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 10-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 10-1 downto 0 );
 begin
   dout <= single_port_ram_data_out_net;
   accumulator_q_net <= din;
@@ -568,11 +552,11 @@ entity shaper_movingaverage1 is
   );
 end shaper_movingaverage1;
 architecture structural of shaper_movingaverage1 is 
-  signal convert_dout_net : std_logic_vector( 36-1 downto 0 );
   signal subtractor1_s_net : std_logic_vector( 28-1 downto 0 );
   signal single_port_ram_data_out_net : std_logic_vector( 36-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
   signal ce_net : std_logic;
+  signal convert_dout_net : std_logic_vector( 36-1 downto 0 );
   signal clk_net : std_logic;
   signal accumulator_q_net : std_logic_vector( 36-1 downto 0 );
   signal sub_s_net : std_logic_vector( 36-1 downto 0 );
@@ -582,7 +566,7 @@ begin
   slice1_y_net <= n;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delayline : entity xil_defaultlib.shaper_delayline_x1 
+  delayline : entity xil_defaultlib.shaper_delayline_x0 
   port map (
     din => accumulator_q_net,
     addr => slice1_y_net,
@@ -656,7 +640,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity shaper_delayline_x0 is
+entity shaper_delayline_x1 is
   port (
     din : in std_logic_vector( 36-1 downto 0 );
     addr : in std_logic_vector( 32-1 downto 0 );
@@ -664,19 +648,19 @@ entity shaper_delayline_x0 is
     ce_1 : in std_logic;
     dout : out std_logic_vector( 36-1 downto 0 )
   );
-end shaper_delayline_x0;
-architecture structural of shaper_delayline_x0 is 
-  signal ce_net : std_logic;
-  signal constant1_op_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 10-1 downto 0 );
-  signal accumulator_q_net : std_logic_vector( 36-1 downto 0 );
-  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
+end shaper_delayline_x1;
+architecture structural of shaper_delayline_x1 is 
   signal single_port_ram_data_out_net : std_logic_vector( 36-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 10-1 downto 0 );
-  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
   signal clk_net : std_logic;
+  signal ce_net : std_logic;
+  signal accumulator_q_net : std_logic_vector( 36-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 10-1 downto 0 );
   signal constant_op_net : std_logic_vector( 10-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 10-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 10-1 downto 0 );
+  signal constant1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   dout <= single_port_ram_data_out_net;
   accumulator_q_net <= din;
@@ -780,21 +764,21 @@ entity shaper_movingaverage2 is
   );
 end shaper_movingaverage2;
 architecture structural of shaper_movingaverage2 is 
-  signal delay_q_net : std_logic_vector( 18-1 downto 0 );
+  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
+  signal convert_dout_net : std_logic_vector( 24-1 downto 0 );
+  signal clk_net : std_logic;
+  signal single_port_ram_data_out_net : std_logic_vector( 36-1 downto 0 );
   signal accumulator_q_net : std_logic_vector( 36-1 downto 0 );
   signal ce_net : std_logic;
-  signal clk_net : std_logic;
+  signal delay_q_net : std_logic_vector( 18-1 downto 0 );
   signal sub_s_net : std_logic_vector( 36-1 downto 0 );
-  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
-  signal single_port_ram_data_out_net : std_logic_vector( 36-1 downto 0 );
-  signal convert_dout_net : std_logic_vector( 24-1 downto 0 );
 begin
   out1 <= convert_dout_net;
   delay_q_net <= in1;
   register4_q_net <= n;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delayline : entity xil_defaultlib.shaper_delayline_x0 
+  delayline : entity xil_defaultlib.shaper_delayline_x1 
   port map (
     din => accumulator_q_net,
     addr => register4_q_net,
@@ -863,7 +847,7 @@ begin
     s => sub_s_net
   );
 end structural;
--- Generated from Simulink block shaper/filter_clk_domain/Filter/offset/toSFIx
+-- Generated from Simulink block shaper/filter_clk_domain/Filter/offset1/toSFIx
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
@@ -875,9 +859,9 @@ entity shaper_tosfix is
   );
 end shaper_tosfix;
 architecture structural of shaper_tosfix is 
-  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 16-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 16-1 downto 0 );
+  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
 begin
   out1 <= reinterpret3_output_port_net;
   register7_q_net <= in1;
@@ -901,12 +885,12 @@ begin
     y => slice3_y_net
   );
 end structural;
--- Generated from Simulink block shaper/filter_clk_domain/Filter/offset
+-- Generated from Simulink block shaper/filter_clk_domain/Filter/offset1
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity shaper_offset is
+entity shaper_offset1 is
   port (
     in1 : in std_logic_vector( 16-1 downto 0 );
     dc_offset : in std_logic_vector( 32-1 downto 0 );
@@ -914,15 +898,14 @@ entity shaper_offset is
     ce_1 : in std_logic;
     out1 : out std_logic_vector( 16-1 downto 0 )
   );
-end shaper_offset;
-architecture structural of shaper_offset is 
+end shaper_offset1;
+architecture structural of shaper_offset1 is 
   signal register7_q_net : std_logic_vector( 32-1 downto 0 );
   signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
-  signal ce_net : std_logic;
   signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
+  signal ce_net : std_logic;
+  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
 begin
   out1 <= addsub1_s_net;
   mcode_y_net <= in1;
@@ -943,13 +926,13 @@ begin
     b_bin_pt => 14,
     b_width => 16,
     c_has_c_out => 0,
-    c_latency => 1,
+    c_latency => 0,
     c_output_width => 17,
     core_name0 => "shaper_c_addsub_v12_0_i3",
     extra_registers => 0,
     full_s_arith => 2,
     full_s_width => 17,
-    latency => 1,
+    latency => 0,
     overflow => 2,
     quantization => 2,
     s_arith => xlSigned,
@@ -959,26 +942,11 @@ begin
   port map (
     clr => '0',
     en => "1",
-    a => delay_q_net,
+    a => mcode_y_net,
     b => reinterpret3_output_port_net,
     clk => clk_net,
     ce => ce_net,
     s => addsub1_s_net
-  );
-  delay : entity xil_defaultlib.shaper_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 16
-  )
-  port map (
-    en => '1',
-    rst => '0',
-    d => mcode_y_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => delay_q_net
   );
 end structural;
 -- Generated from Simulink block shaper/filter_clk_domain/Filter/offset2/toSFIx
@@ -993,9 +961,9 @@ entity shaper_tosfix_x0 is
   );
 end shaper_tosfix_x0;
 architecture structural of shaper_tosfix_x0 is 
-  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 24-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 24-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 24-1 downto 0 );
+  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
 begin
   out1 <= reinterpret3_output_port_net;
   register11_q_net <= in1;
@@ -1034,12 +1002,12 @@ entity shaper_offset2 is
   );
 end shaper_offset2;
 architecture structural of shaper_offset2 is 
-  signal reinterpret3_output_port_net : std_logic_vector( 24-1 downto 0 );
-  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
-  signal ce_net : std_logic;
-  signal convert_dout_net : std_logic_vector( 24-1 downto 0 );
-  signal clk_net : std_logic;
   signal register11_q_net : std_logic_vector( 32-1 downto 0 );
+  signal convert_dout_net : std_logic_vector( 24-1 downto 0 );
+  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 24-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
 begin
   out1 <= subtractor_s_net;
   convert_dout_net <= in1;
@@ -1095,9 +1063,9 @@ entity shaper_toufix is
   );
 end shaper_toufix;
 architecture structural of shaper_toufix is 
-  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
   signal register5_q_net : std_logic_vector( 32-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 25-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
 begin
   out1 <= reinterpret3_output_port_net;
   register5_q_net <= in1;
@@ -1133,9 +1101,9 @@ entity shaper_toufix2 is
   );
 end shaper_toufix2;
 architecture structural of shaper_toufix2 is 
-  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
-  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 25-1 downto 0 );
+  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
 begin
   out1 <= reinterpret3_output_port_net;
   register9_q_net <= in1;
@@ -1253,27 +1221,27 @@ entity shaper_poles_correction is
   );
 end shaper_poles_correction;
 architecture structural of shaper_poles_correction is 
-  signal reinterpret3_output_port_net_x1 : std_logic_vector( 25-1 downto 0 );
-  signal reinterpret3_output_port_net_x2 : std_logic_vector( 25-1 downto 0 );
-  signal multiplier2_p_net : std_logic_vector( 25-1 downto 0 );
-  signal addsub1_s_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal delay3_q_net : std_logic_vector( 39-1 downto 0 );
+  signal multiplier4_p_net : std_logic_vector( 43-1 downto 0 );
+  signal multiplier1_p_net : std_logic_vector( 40-1 downto 0 );
+  signal multiplier3_p_net : std_logic_vector( 39-1 downto 0 );
+  signal addsub1_s_net : std_logic_vector( 41-1 downto 0 );
+  signal addsub2_s_net : std_logic_vector( 43-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal register5_q_net : std_logic_vector( 32-1 downto 0 );
   signal reinterpret3_output_port_net_x0 : std_logic_vector( 25-1 downto 0 );
-  signal addsub_s_net : std_logic_vector( 43-1 downto 0 );
-  signal multiplier3_p_net : std_logic_vector( 39-1 downto 0 );
-  signal delay3_q_net : std_logic_vector( 39-1 downto 0 );
-  signal delay2_q_net : std_logic_vector( 16-1 downto 0 );
-  signal addsub2_s_net : std_logic_vector( 43-1 downto 0 );
-  signal multiplier4_p_net : std_logic_vector( 43-1 downto 0 );
+  signal reinterpret3_output_port_net_x1 : std_logic_vector( 25-1 downto 0 );
+  signal reinterpret3_output_port_net_x2 : std_logic_vector( 25-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
-  signal addsub1_s_net : std_logic_vector( 41-1 downto 0 );
-  signal multiplier1_p_net : std_logic_vector( 40-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 43-1 downto 0 );
+  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
+  signal multiplier2_p_net : std_logic_vector( 25-1 downto 0 );
+  signal addsub1_s_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal register5_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
+  signal delay2_q_net : std_logic_vector( 16-1 downto 0 );
+  signal addsub_s_net : std_logic_vector( 43-1 downto 0 );
+  signal delay4_q_net : std_logic_vector( 43-1 downto 0 );
 begin
   out1 <= multiplier2_p_net;
   addsub1_s_net_x0 <= x;
@@ -1329,7 +1297,7 @@ begin
     clr => '0',
     en => "1",
     a => delay2_q_net,
-    b => addsub2_s_net,
+    b => delay4_q_net,
     clk => clk_net,
     ce => ce_net,
     s => addsub_s_net
@@ -1374,13 +1342,13 @@ begin
     b_bin_pt => 37,
     b_width => 43,
     c_has_c_out => 0,
-    c_latency => 1,
+    c_latency => 0,
     c_output_width => 44,
-    core_name0 => "shaper_c_addsub_v12_0_i7",
+    core_name0 => "shaper_c_addsub_v12_0_i5",
     extra_registers => 0,
     full_s_arith => 2,
     full_s_width => 44,
-    latency => 1,
+    latency => 0,
     overflow => 2,
     quantization => 2,
     s_arith => xlSigned,
@@ -1425,6 +1393,21 @@ begin
     clk => clk_net,
     ce => ce_net,
     q => delay3_q_net
+  );
+  delay4 : entity xil_defaultlib.shaper_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 43
+  )
+  port map (
+    en => '1',
+    rst => '0',
+    d => addsub2_s_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => delay4_q_net
   );
   multiplier1 : entity xil_defaultlib.shaper_xlmult 
   generic map (
@@ -1492,7 +1475,7 @@ begin
     core_clr => '1',
     en => "1",
     rst => "0",
-    a => delay_q_net,
+    a => addsub_s_net,
     b => reinterpret3_output_port_net_x0,
     clk => clk_net,
     ce => ce_net,
@@ -1574,21 +1557,6 @@ begin
     core_ce => ce_net,
     p => multiplier4_p_net
   );
-  delay : entity xil_defaultlib.shaper_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 43
-  )
-  port map (
-    en => '1',
-    rst => '0',
-    d => addsub_s_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => delay_q_net
-  );
 end structural;
 -- Generated from Simulink block shaper/filter_clk_domain/Filter/pulse_unfolder/toUFix1
 library IEEE;
@@ -1602,9 +1570,9 @@ entity shaper_toufix1 is
   );
 end shaper_toufix1;
 architecture structural of shaper_toufix1 is 
+  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
   signal register1_q_net : std_logic_vector( 32-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 25-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
 begin
   out1 <= reinterpret3_output_port_net;
   register1_q_net <= in1;
@@ -1643,13 +1611,13 @@ entity shaper_pulse_unfolder is
   );
 end shaper_pulse_unfolder;
 architecture structural of shaper_pulse_unfolder is 
-  signal delay1_q_net : std_logic_vector( 25-1 downto 0 );
-  signal ce_net : std_logic;
-  signal subtractor1_s_net : std_logic_vector( 28-1 downto 0 );
   signal register1_q_net : std_logic_vector( 32-1 downto 0 );
-  signal clk_net : std_logic;
+  signal ce_net : std_logic;
   signal reinterpret3_output_port_net : std_logic_vector( 25-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 25-1 downto 0 );
+  signal clk_net : std_logic;
   signal multiplier2_p_net_x0 : std_logic_vector( 25-1 downto 0 );
+  signal subtractor1_s_net : std_logic_vector( 28-1 downto 0 );
   signal multiplier2_p_net : std_logic_vector( 32-1 downto 0 );
   signal delay2_q_net : std_logic_vector( 25-1 downto 0 );
 begin
@@ -1741,7 +1709,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 35,
-    core_name0 => "shaper_c_addsub_v12_0_i8",
+    core_name0 => "shaper_c_addsub_v12_0_i7",
     extra_registers => 2,
     full_s_arith => 2,
     full_s_width => 35,
@@ -1778,12 +1746,12 @@ entity shaper_signinverter is
 end shaper_signinverter;
 architecture structural of shaper_signinverter is 
   signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
   signal x_net : std_logic_vector( 16-1 downto 0 );
   signal ce_net : std_logic;
   signal clk_net : std_logic;
-  signal convert_dout_net : std_logic_vector( 1-1 downto 0 );
   signal slice_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal convert_dout_net : std_logic_vector( 1-1 downto 0 );
 begin
   y <= mcode_y_net;
   x_net <= x;
@@ -1865,33 +1833,33 @@ end shaper_filter;
 architecture structural of shaper_filter is 
   signal mux1_y_net : std_logic_vector( 24-1 downto 0 );
   signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
-  signal register1_q_net : std_logic_vector( 32-1 downto 0 );
+  signal sub_s_net : std_logic_vector( 16-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
   signal x_net : std_logic_vector( 16-1 downto 0 );
-  signal sub_s_net : std_logic_vector( 16-1 downto 0 );
-  signal convert_dout_net_x1 : std_logic_vector( 36-1 downto 0 );
-  signal register10_q_net : std_logic_vector( 32-1 downto 0 );
-  signal ce_net : std_logic;
-  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 18-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 24-1 downto 0 );
-  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register1_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register2_q_net : std_logic_vector( 32-1 downto 0 );
   signal register3_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
-  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
-  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
-  signal multiplier2_p_net : std_logic_vector( 25-1 downto 0 );
   signal register5_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
+  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
+  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register10_q_net : std_logic_vector( 32-1 downto 0 );
+  signal subtractor_s_net : std_logic_vector( 24-1 downto 0 );
+  signal clk_net : std_logic;
+  signal convert_dout_net_x1 : std_logic_vector( 36-1 downto 0 );
   signal slice_y_net : std_logic_vector( 1-1 downto 0 );
   signal subtractor1_s_net : std_logic_vector( 28-1 downto 0 );
-  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
-  signal clk_net : std_logic;
+  signal ce_net : std_logic;
+  signal constant1_op_net : std_logic_vector( 24-1 downto 0 );
+  signal multiplier2_p_net : std_logic_vector( 25-1 downto 0 );
+  signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 10-1 downto 0 );
   signal convert_dout_net_x2 : std_logic_vector( 24-1 downto 0 );
-  signal register2_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
 begin
   y <= mux1_y_net;
   impulse <= addsub1_s_net;
@@ -1955,7 +1923,7 @@ begin
     ce_1 => ce_net,
     out1 => convert_dout_net_x2
   );
-  offset : entity xil_defaultlib.shaper_offset 
+  offset1 : entity xil_defaultlib.shaper_offset1 
   port map (
     in1 => mcode_y_net,
     dc_offset => register7_q_net,
@@ -2082,28 +2050,28 @@ entity shaper_filter_clk_domain is
   );
 end shaper_filter_clk_domain;
 architecture structural of shaper_filter_clk_domain is 
+  signal register10_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
+  signal clk_net : std_logic;
   signal register2_q_net : std_logic_vector( 32-1 downto 0 );
+  signal ce_net : std_logic;
+  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
+  signal mux1_y_net : std_logic_vector( 24-1 downto 0 );
   signal register1_q_net : std_logic_vector( 32-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 24-1 downto 0 );
   signal register5_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register3_q_net : std_logic_vector( 32-1 downto 0 );
-  signal mux1_y_net : std_logic_vector( 24-1 downto 0 );
-  signal register10_q_net : std_logic_vector( 32-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
-  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
-  signal ce_net : std_logic;
-  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
   signal sub_s_net : std_logic_vector( 16-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
-  signal clk_net : std_logic;
+  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register3_q_net : std_logic_vector( 32-1 downto 0 );
+  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
   signal x_net : std_logic_vector( 16-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
+  signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
+  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
 begin
   register1_q_net <= b10;
   register2_q_net <= na_inv;
@@ -2194,36 +2162,36 @@ entity shaper_struct is
   );
 end shaper_struct;
 architecture structural of shaper_struct is 
-  signal r4_nb_net : std_logic_vector( 32-1 downto 0 );
-  signal r5_b20_net : std_logic_vector( 32-1 downto 0 );
-  signal r6_dc_offset_1_net : std_logic_vector( 32-1 downto 0 );
   signal r10_flags_net : std_logic_vector( 32-1 downto 0 );
-  signal r1_b10_net : std_logic_vector( 32-1 downto 0 );
-  signal r11_dc_offset_2_net : std_logic_vector( 32-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
   signal r2_na_inv_net : std_logic_vector( 32-1 downto 0 );
   signal r3_na_net : std_logic_vector( 32-1 downto 0 );
-  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
-  signal r8_b1_net : std_logic_vector( 32-1 downto 0 );
-  signal register2_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register3_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
-  signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
+  signal r6_dc_offset_1_net : std_logic_vector( 32-1 downto 0 );
+  signal r11_dc_offset_2_net : std_logic_vector( 32-1 downto 0 );
+  signal r1_b10_net : std_logic_vector( 32-1 downto 0 );
+  signal r4_nb_net : std_logic_vector( 32-1 downto 0 );
   signal r7_b2_net : std_logic_vector( 32-1 downto 0 );
-  signal ce_net : std_logic;
-  signal register5_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 24-1 downto 0 );
-  signal x_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal r5_b20_net : std_logic_vector( 32-1 downto 0 );
   signal r9_aa20_net : std_logic_vector( 32-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
-  signal register1_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
-  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
+  signal r8_b1_net : std_logic_vector( 32-1 downto 0 );
+  signal x_net : std_logic_vector( 16-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 24-1 downto 0 );
+  signal register5_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register9_q_net : std_logic_vector( 32-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
   signal register10_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register3_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register4_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register2_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register7_q_net : std_logic_vector( 32-1 downto 0 );
+  signal addsub1_s_net : std_logic_vector( 16-1 downto 0 );
+  signal register8_q_net : std_logic_vector( 32-1 downto 0 );
+  signal ce_net : std_logic;
+  signal register11_q_net : std_logic_vector( 32-1 downto 0 );
+  signal register6_q_net : std_logic_vector( 32-1 downto 0 );
+  signal mcode_y_net : std_logic_vector( 16-1 downto 0 );
+  signal register1_q_net : std_logic_vector( 32-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   r10_flags_net <= r10_flags;
   r11_dc_offset_2_net <= r11_dc_offset_2;
@@ -2482,7 +2450,7 @@ entity shaper is
 end shaper;
 architecture structural of shaper is 
   attribute core_generation_info : string;
-  attribute core_generation_info of structural : architecture is "shaper,sysgen_core_2022_2,{,compilation=IP Catalog,block_icon_display=Default,family=artix7,part=xc7a35t,speed=-1,package=cpg236,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,testbench=0,interface_doc=1,ce_clr=0,clock_period=20,system_simulink_period=2e-08,waveform_viewer=0,axilite_interface=0,ip_catalog_plugin=0,hwcosim_burst_mode=0,simulation_time=0.001,accum=2,addsub=10,constant=9,convert=5,counter=3,delay=9,inv=1,mcode=1,mult=6,mux=2,register=11,reinterpret=14,relational=4,slice=14,spram=3,}";
+  attribute core_generation_info of structural : architecture is "shaper,sysgen_core_2022_2,{,compilation=IP Catalog,block_icon_display=Default,family=artix7,part=xc7a35t,speed=-1,package=cpg236,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,testbench=0,interface_doc=1,ce_clr=0,clock_period=20,system_simulink_period=2e-08,waveform_viewer=0,axilite_interface=0,ip_catalog_plugin=0,hwcosim_burst_mode=0,simulation_time=0.001,accum=2,addsub=10,constant=9,convert=5,counter=3,delay=7,inv=1,mcode=1,mult=6,mux=2,register=11,reinterpret=14,relational=4,slice=14,spram=3,}";
   signal clk_1_net : std_logic;
   signal ce_1_net : std_logic;
 begin

@@ -556,17 +556,17 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_constant_08104d262e is
+entity sysgen_constant_05b3186a9b is
   port (
     op : out std_logic_vector((16 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_constant_08104d262e;
-architecture behavior of sysgen_constant_08104d262e
+end sysgen_constant_05b3186a9b;
+architecture behavior of sysgen_constant_05b3186a9b
 is
 begin
-  op <= "0111111111111110";
+  op <= "0011111111111110";
 end behavior;
 
 library xil_defaultlib;
@@ -1388,8 +1388,6 @@ entity shaper_xladdsub is
  component shaper_c_addsub_v12_0_i3
     port ( 
     a: in std_logic_vector(17 - 1 downto 0);
-    clk: in std_logic:= '0';
-    ce: in std_logic:= '0';
     s: out std_logic_vector(c_output_width - 1 downto 0);
     b: in std_logic_vector(17 - 1 downto 0) 
  		  ); 
@@ -1422,16 +1420,6 @@ entity shaper_xladdsub is
  end component;
 
  component shaper_c_addsub_v12_0_i7
-    port ( 
-    a: in std_logic_vector(44 - 1 downto 0);
-    clk: in std_logic:= '0';
-    ce: in std_logic:= '0';
-    s: out std_logic_vector(c_output_width - 1 downto 0);
-    b: in std_logic_vector(44 - 1 downto 0) 
- 		  ); 
- end component;
-
- component shaper_c_addsub_v12_0_i8
     port ( 
     a: in std_logic_vector(35 - 1 downto 0);
     clk: in std_logic:= '0';
@@ -1493,8 +1481,6 @@ begin
   core_instance3:shaper_c_addsub_v12_0_i3
    port map ( 
          a => full_a,
-         clk => clk,
-         ce => internal_ce,
          s => core_s,
          b => full_b
   ); 
@@ -1531,17 +1517,6 @@ begin
 
  comp7: if ((core_name0 = "shaper_c_addsub_v12_0_i7")) generate 
   core_instance7:shaper_c_addsub_v12_0_i7
-   port map ( 
-         a => full_a,
-         clk => clk,
-         ce => internal_ce,
-         s => core_s,
-         b => full_b
-  ); 
-   end generate;
-
- comp8: if ((core_name0 = "shaper_c_addsub_v12_0_i8")) generate 
-  core_instance8:shaper_c_addsub_v12_0_i8
    port map ( 
          a => full_a,
          clk => clk,

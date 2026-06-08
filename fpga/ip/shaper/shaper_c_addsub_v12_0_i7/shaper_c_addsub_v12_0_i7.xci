@@ -1,13 +1,13 @@
 {
   "schema": "xilinx.com:schema:json_instance:1.0",
   "ip_inst": {
-    "xci_name": "shaper_c_addsub_v12_0_i8",
+    "xci_name": "shaper_c_addsub_v12_0_i7",
     "component_reference": "xilinx.com:ip:c_addsub:12.0",
     "ip_revision": "14",
-    "gen_directory": "../../../projects/dpp/vivado/dpp.tmp/shaper_v2_0_project/shaper_v2_0_project.gen/sources_1/ip/shaper_c_addsub_v12_0_i8",
+    "gen_directory": "../../../projects/dpp/vivado/dpp.tmp/shaper_v2_0_project/shaper_v2_0_project.gen/sources_1/ip/shaper_c_addsub_v12_0_i7",
     "parameters": {
       "component_parameters": {
-        "Component_Name": [ { "value": "shaper_c_addsub_v12_0_i8", "resolve_type": "user", "usage": "all" } ],
+        "Component_Name": [ { "value": "shaper_c_addsub_v12_0_i7", "resolve_type": "user", "usage": "all" } ],
         "Implementation": [ { "value": "DSP48", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
         "A_Type": [ { "value": "Signed", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
         "B_Type": [ { "value": "Signed", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
@@ -81,7 +81,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "14" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../projects/dpp/vivado/dpp.tmp/shaper_v2_0_project/shaper_v2_0_project.gen/sources_1/ip/shaper_c_addsub_v12_0_i8" } ],
+        "OUTPUTDIR": [ { "value": "../../../projects/dpp/vivado/dpp.tmp/shaper_v2_0_project/shaper_v2_0_project.gen/sources_1/ip/shaper_c_addsub_v12_0_i7" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],

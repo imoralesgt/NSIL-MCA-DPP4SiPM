@@ -139,7 +139,7 @@ IAEA:user:timers:1.0\
 iaea.org:user:wire_timers:1.0\
 IAEA:user:blr_fast:1.0\
 iaea.org:user:ip_dbg_pulse_cond_fast:1.0\
-IAEA:user:shaper:3.0\
+iaea:user:shaper:2.0\
 iaea.org:user:wire_blr_fast:1.0\
 iaea.org:user:blr:2.0\
 iaea.org:interface:ip_dbg_pulse_cond_slow:1.0\
@@ -885,12 +885,12 @@ proc create_hier_cell_pulse_filtering_slow { parentCell nameHier } {
   set ip_dbg_pulse_cond_sl_0 [ create_bd_cell -type ip -vlnv iaea.org:interface:ip_dbg_pulse_cond_slow:1.0 ip_dbg_pulse_cond_sl_0 ]
 
   # Create instance: shaper_0, and set properties
-  set shaper_0 [ create_bd_cell -type ip -vlnv IAEA:user:shaper:3.0 shaper_0 ]
+  set shaper_0 [ create_bd_cell -type ip -vlnv iaea:user:shaper:2.0 shaper_0 ]
 
   # Create interface connections
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins dbg_pulse_cond_slow_m0] [get_bd_intf_pins ip_dbg_pulse_cond_sl_0/dbg_pulse_cond_slow_m0]
+  connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins shaper] [get_bd_intf_pins shaper_0/shaper]
   connect_bd_intf_net -intf_net blr_slow_1 [get_bd_intf_pins blr_slow] [get_bd_intf_pins blr_0/blr_slow]
-  connect_bd_intf_net -intf_net shaper_2 [get_bd_intf_pins shaper] [get_bd_intf_pins shaper_0/shaper]
 
   # Create port connections
   connect_bd_net -net blr_0_dbg_1 [get_bd_pins blr_0/dbg_1] [get_bd_pins ip_dbg_pulse_cond_sl_0/dc_stab_acc]
@@ -903,7 +903,7 @@ proc create_hier_cell_pulse_filtering_slow { parentCell nameHier } {
   connect_bd_net -net clk_1 [get_bd_pins clk_dpp] [get_bd_pins blr_0/clk] [get_bd_pins shaper_0/clk]
   connect_bd_net -net data_in_1 [get_bd_pins data_in] [get_bd_pins shaper_0/x]
   connect_bd_net -net fast_discriminator_1 [get_bd_pins fast_discriminator] [get_bd_pins blr_0/fast_discriminator]
-  connect_bd_net -net shaper_1_y [get_bd_pins blr_0/x] [get_bd_pins shaper_0/y]
+  connect_bd_net -net shaper_0_y [get_bd_pins blr_0/x] [get_bd_pins shaper_0/y]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -965,15 +965,15 @@ proc create_hier_cell_pulse_filtering_fast { parentCell nameHier } {
   set ip_dbg_pulse_cond_fa_0 [ create_bd_cell -type ip -vlnv iaea.org:user:ip_dbg_pulse_cond_fast:1.0 ip_dbg_pulse_cond_fa_0 ]
 
   # Create instance: shaper_0, and set properties
-  set shaper_0 [ create_bd_cell -type ip -vlnv IAEA:user:shaper:3.0 shaper_0 ]
+  set shaper_0 [ create_bd_cell -type ip -vlnv iaea:user:shaper:2.0 shaper_0 ]
 
   # Create instance: wire_blr_fast_0, and set properties
   set wire_blr_fast_0 [ create_bd_cell -type ip -vlnv iaea.org:user:wire_blr_fast:1.0 wire_blr_fast_0 ]
 
   # Create interface connections
+  connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins shaper] [get_bd_intf_pins shaper_0/shaper]
   connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins blr_fast] [get_bd_intf_pins wire_blr_fast_0/blr_fast]
   connect_bd_intf_net -intf_net ip_dbg_pulse_cond_fa_0_dbg_pulse_cond_fast [get_bd_intf_pins dbg_pulse_cond_fast] [get_bd_intf_pins ip_dbg_pulse_cond_fa_0/dbg_pulse_cond_fast]
-  connect_bd_intf_net -intf_net shaper_2 [get_bd_intf_pins shaper] [get_bd_intf_pins shaper_0/shaper]
 
   # Create port connections
   connect_bd_net -net blr_fast_0_dbg_1 [get_bd_pins blr_fast_0/dbg_1] [get_bd_pins ip_dbg_pulse_cond_fa_0/shaper]
@@ -984,8 +984,8 @@ proc create_hier_cell_pulse_filtering_fast { parentCell nameHier } {
   connect_bd_net -net data_in_1 [get_bd_pins data_in] [get_bd_pins shaper_0/x]
   connect_bd_net -net ip_blr_0_y [get_bd_pins y] [get_bd_pins blr_fast_0/y] [get_bd_pins ip_dbg_pulse_cond_fa_0/blr]
   connect_bd_net -net ip_blr_0_zc [get_bd_pins threshold] [get_bd_pins blr_fast_0/threshold] [get_bd_pins ip_dbg_pulse_cond_fa_0/dc_stab]
-  connect_bd_net -net shaper_1_y [get_bd_pins blr_fast_0/x] [get_bd_pins shaper_0/y]
-  connect_bd_net -net shaper_1_y_bipolar [get_bd_pins blr_fast_0/x_bipolar] [get_bd_pins shaper_0/y_bipolar]
+  connect_bd_net -net shaper_0_y [get_bd_pins blr_fast_0/x] [get_bd_pins shaper_0/y]
+  connect_bd_net -net shaper_0_y_bipolar [get_bd_pins blr_fast_0/x_bipolar] [get_bd_pins shaper_0/y_bipolar]
   connect_bd_net -net wire_blr_fast_0_r1_threshold_out [get_bd_pins blr_fast_0/r1_threshold] [get_bd_pins wire_blr_fast_0/r1_threshold_out]
   connect_bd_net -net wire_blr_fast_0_r2_flags_out [get_bd_pins blr_fast_0/r2_flags] [get_bd_pins wire_blr_fast_0/r2_flags_out]
   connect_bd_net -net wire_blr_fast_0_r3_threshold_gain_out [get_bd_pins blr_fast_0/r3_threshold_gain] [get_bd_pins wire_blr_fast_0/r3_threshold_gain_out]
