@@ -26,8 +26,7 @@ def main():
     daq_finder = DaqHw()
 
     # 2. Automatically locate the device using default VID/PID attributes
-    logger.info("Scanning for connected DAQ boards (VID: %s, PID: %s)...", 
-                daq_finder.DEFAULT_VID, daq_finder.DEFAULT_PID)
+    logger.info(f"Scanning for connected DAQ boards (VID: daq_finder.DEFAULT_VID, PID: {daq_finder.DEFAULT_PID})...")
     
     port_name = daq_finder.find_port(daq_finder.DEFAULT_VID, daq_finder.DEFAULT_PID)
 
@@ -37,10 +36,10 @@ def main():
         
     # Handle edge case where find_port might return a list of devices
     if isinstance(port_name, list):
-        logger.warning("Multiple target DAQ devices detected. Using first node: %s", port_name[0])
+        logger.warning(f"Multiple target DAQ devices detected. Using first node: {port_name[0]}", )
         port_name = port_name[0]
 
-    logger.info("DAQ device successfully discovered at: %s", port_name)
+    logger.info(f"DAQ device successfully discovered at: {port_name}")
 
     # 3. Instantiate the High-Level API Front Facade
     # Passing minimum required parameters for the internal Dpp_Parameters tracker
