@@ -224,7 +224,7 @@ class Dpp_Shaper(__Dpp_Common):
         self.r9_aa20_32_0 = self._compute_r9_aa20()
         self.r10_flags_32_0 = self._compute_r10_flags()
         self.r11_offset_2_32_0 = self._compute_r11_offset_2()
-        self.r12_delay_line_32_0 = self._compute_r12_delay_line()
+        # self.r12_delay_line_32_0 = self._compute_r12_delay_line()
 
         self.params_dict = {
             'r1_b10_32_0'           : self.r1_b10_32_0,
@@ -1681,12 +1681,12 @@ class DppParameters:
     def __init__(self, sampling_rate : float,
                  tau_d : float,
                  tau_r : float,
-                 shaper_s_tau_pk : float = 2.0,
-                 shaper_s_tau_pk_top : float = 1.0,
-                 shaper_f_tau_pk : float = 0.3,
-                 shaper_f_tau_pk_top : float = 0.3,
-                 shaper_s_gain : float = 2.0,
-                 shaper_f_gain : float = 2.0,
+                 shaper_s_tau_pk : float = 2.0e-6,
+                 shaper_s_tau_pk_top : float = 1.0e-6,
+                 shaper_f_tau_pk : float = 0.3e-6,
+                 shaper_f_tau_pk_top : float = 0.3e-6,
+                 shaper_s_gain : float = 1.0,
+                 shaper_f_gain : float = 1.0,
                  blr_s_threshold_high : float = 0.0,
                  blr_s_threshold_low : float = -0.05,
                  blr_s_threshold_gain : float = 2.0,
@@ -2186,7 +2186,7 @@ if __name__ == '__main__':
     
 
     # Initializing the DPP parameters class instance
-    dpp_parameters = Dpp_Parameters(
+    dpp_parameters = DppParameters(
         sampling_rate=SAMPLING_RATE,
         tau_d=TAU_D,
         tau_r=TAU_R,

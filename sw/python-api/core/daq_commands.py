@@ -9,7 +9,8 @@ from core.dpp_parameters import DppParameters
 from core.daq_constants import DaqCliCommands, DppSubmodules
 from enum import Enum
 import struct, logging
-from typing import List, Tuple, Dict, Any, contextmanager
+from typing import List, Tuple, Dict, Any
+from contextlib import contextmanager
 
 # Dedicated global logger for high-level operations and serial transactions
 logger = logging.getLogger("DAQ_MCA_API")
