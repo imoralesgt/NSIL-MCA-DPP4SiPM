@@ -8,7 +8,7 @@ Description: Hardware-in-the-Loop (HIL) integration test suite running
 
 import pytest, time, logging, os
 import matplotlib.pyplot as plt  # Import for automated spectrum visualization
-from tqdm import tqdm
+from tqdm import trange
 from core.daq_constants import DppSubmodules
 from core.daq_commands import DaqCommands
 
@@ -117,7 +117,8 @@ def test_hil_phase3_acquisition_and_streaming(daq_api):
 
     # 4. Collect the spectrum for at least 30 seconds
     logger.info("Collecting spectrum for 30 seconds.")
-    time.sleep(30)
+    for i in trange(30, desc="Collecting spectrum...", unit="s"):
+        time.sleep(1)
 
     # 5. Poll again the timer statistics mid-run
     timer_metrics = daq_api.timers_read()

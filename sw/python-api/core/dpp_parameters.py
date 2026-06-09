@@ -1793,21 +1793,61 @@ class DppParameters:
             sampling_rate (float): Sampling rate of the ADC
             tau_d (float): Decay time constant of the detector (in seconds)
             tau_r (float): Rise time constant of the detector (in seconds)
-            tau_pk (float): Peaking time (in seconds)
-            tau_pk_top (float): Flat top time (in seconds)
-            tau_pk_fast (float): Peaking time for fast shaper (in seconds)
-            tau_pk_top_fast (float): Flat top time for fast shaper (in seconds)
-            threshold_gain (float, optional): Gain for high threshold. Defaults to 2.0.
-            threshold_gain_fast (float, optional): Gain for high threshold for fast peak detector. Defaults to 1.5.
-            threshold_low_gain (float, optional): Gain for low threshold. Defaults to 2.0.
-            blanking_time_factor (float, optional): Blanking time factor. Defaults to 0.9.
-            time_over_threshold_factor (float, optional): Time over threshold factor. Defaults to 0.44.
-            x_min (float, optional): Minimum value for the output. Defaults to 0.01.
-            x_max (float, optional): Maximum value for the output. Defaults to 1.99.
-            invert_pulse (bool, optional): Invert original pulse before shaping. Defaults to False.
-            dc_offset (float, optional): Signal input DC offset. Defaults to -0.77.
-            poles (int, optional): Number of poles in the pulse shaper filter. Defaults to 2.
-            tau_l (float, optional): Long undershoot constant (in seconds, for PMT only). Defaults to 50e-6.
+            shaper_s_tau_pk (float, optional): Peaking time for slow shaper (in seconds). Defaults to 2.0e-6.
+            shaper_s_tau_pk_top (float, optional): Flat top time for slow shaper (in seconds). Defaults to 1.0e-6.
+            shaper_f_tau_pk (float, optional): Peaking time for fast shaper (in seconds). Defaults to 0.3e-6.
+            shaper_f_tau_pk_top (float, optional): Flat top time for fast shaper (in seconds). Defaults to 0.
+            shaper_s_gain (float, optional): Gain for slow shaper. Defaults to 1.0.
+            shaper_f_gain (float, optional): Gain for fast shaper. Defaults to 1.0.
+            blr_s_threshold_high (float, optional): High threshold for slow baseline restorer (in Volts). Defaults to 0.0.
+            blr_s_threshold_low (float, optional): Low threshold for slow baseline restorer (in Volts). Defaults to -0.05.
+            blr_s_threshold_gain (float, optional): Gain for high threshold for slow baseline restorer. Defaults to 2.5.
+            blr_s_threshold_low_gain (float, optional): Gain for low threshold for slow baseline restorer. Defaults to 50.0.
+            blr_s_enable (bool, optional): Enable slow baseline restorer. Defaults to True.
+            blr_f_threshold_high (float, optional): High threshold for fast baseline restorer (in Volts). Defaults to 0.0.
+            blr_f_threshold_low (float, optional): Low threshold for fast baseline restorer (in Volts). Defaults to -0.05.
+            blr_f_threshold_gain (float, optional): Gain for high threshold for fast baseline restorer. Defaults to 1.5.
+            blr_f_threshold_low_gain (float, optional): Gain for low threshold for fast baseline restorer. Defaults to 2.0.
+            blr_f_enable (bool, optional): Enable fast baseline restorer. Defaults to False.
+            pkd_blanking_time_factor (float, optional): Blanking time factor for peak detector. Defaults to 0.9.
+            pkd_time_over_threshold_factor (float, optional): Time over threshold factor for peak detector. Defaults to 0.44.
+            pur_guard_time_factor (float, optional): Guard time factor for the pile-up rejector. Defaults to 1.5.
+            pur_enable (bool, optional): Enable the pile-up rejector. Defaults to True.
+            pkd_s_x_min (float, optional): Minimum value (LLD) for slow peak detector (in Volts). Defaults to 0.01.
+            pkd_s_x_max (float, optional): Maximum value (ULD) for slow peak detector (in Volts). Defaults to 1.99.
+            pkd_f_x_min (float, optional): Minimum value (LLD) for fast peak detector (in Volts). Defaults to 0.025.
+            pkd_f_x_max (float, optional): Maximum value (ULD) for fast peak detector (in Volts). Defaults to 1.957.
+            invert_pulse (bool, optional): Invert pulse polarity. Defaults to False.
+            smoothing_factor (int, optional): Smoothing factor (moving average). Valid 1, 2, 4, 8. Defaults to 1.
+            dc_offset (float, optional): Input signal DC offset (in Volts). Range [-2.0, 2.0]. Defaults to -0.77.
+            poles (int, optional): Number of poles for the shaper to compensate PMT long tail. Defaults to 2 (SiPM).
+            tau_l (float, optional): Long undershoot constant for PMT (in seconds). Defaults to 50.0e-6.
+            scope_bram_size (int, optional): Size of the scope buffer (in samples). Defaults to 2048.
+            scope_threshold (float, optional): Scope threshold (in Volts). Defaults to 0.04.
+            scope_delay (float, optional): Scope delay (in samples). Defaults to 1000.
+            scope_enabled (bool, optional): Enable scope. Defaults to True.
+            scope_clear (bool, optional): Clear scope buffer before first stream. Defaults to True.
+            scope_downsample (int, optional): Scope downsample factor. Defaults to 1.
+            scope_sampling_mode_flag (bool, optional): Scope sampling mode flag. Defaults to 1. See documentation
+            scope_mux_ch1 (int, optional): Scope mux channel 1. Defaults to 3.
+            scope_mux_ch2 (int, optional): Scope mux channel 2. Defaults to 2.
+            timers_preset (int, optional): Timer collection time (in milliseconds). Defaults to 10000000.
+            timers_auto_mode (bool, optional): Timer auto mode (ping-ping buffer in MCA). Defaults to False.
+            timers_a_live_time (bool, optional): Measure Live Time with Timer A (instead of Real Time). Defaults to False.
+            timers_b_live_time (bool, optional): Measure Live Time with Timer B (instead of Real Time). Defaults to False.
+            timers_c_live_time (bool, optional): Measure Live Time with Timer C (instead of Real Time). Defaults to True.
+            timers_a_enable (bool, optional): Enable Timer A. Defaults to True.
+            timers_b_enable (bool, optional): Enable Timer B. Defaults to False.
+            timers_c_enable (bool, optional): Enable Timer C. Defaults to True.
+            timers_a_clear (bool, optional): Clear Timer A before data acquisition. Defaults to False.
+            timers_b_clear (bool, optional): Clear Timer B before data acquisition. Defaults to False.
+            timers_c_clear (bool, optional): Clear Timer C before data acquisition. Defaults to False.
+            high_voltage (float, optional): High voltage output for PMT (in Volts). Defaults to 0.0.
+            vga_board_version (str, optional): Board version, used to configure variable-gain amplifier. Defaults to "B".
+            vga_gain_fine (float, optional): VGA fine gain. Defaults to 1.
+            vga_gain_coarse (float, optional): VGA coarse gain. Defaults to 1.
+
+
         """
         self.shaper_slow = Dpp_Shaper_Slow(
             sampling_rate=sampling_rate,
