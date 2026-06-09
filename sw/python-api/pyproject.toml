@@ -8,4 +8,5 @@ dependencies = [
     "fixedpoint>=1.0.1",
     "numpy>=2.4.6",
     "pyserial>=3.5",
+    "pytest>=9.0.3",
 ]
