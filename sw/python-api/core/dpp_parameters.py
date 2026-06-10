@@ -1,4 +1,14 @@
 """
+Module: dpp_parameters.py
+Description: Used to convert the human-readable DPP parameter values into 
+             unsinged 32-bit fixed point values sent to the DAQ/MCA board.
+
+Revisions:
+    1.0.0 - Initial release (2025-10-03) - I. Morales, M. Bogovac
+    1.0.1 - Added PuR parameters (2026-05-25) - I. Morales
+    1.0.2 - Fixed computation bugs in BLR slow (2026-06-09) - I. Morales
+             
+
 Instructions:
     - Scroll down to the end of this file
     - Inspect how the library is used in the `if __name__ == "__main__":` block
@@ -7,10 +17,12 @@ Instructions:
     - Requirements: fixedpoint, numpy
 """
 
+from __future__ import annotations
+
 __authors__ = "Ivan Morales, Mladen Bogovac"
 __license__ = "MIT"
-__version__ = "1.1"
-__date__ = "2026-05-25"
+__version__ = "1.0.2"
+__date__ = "2026-06-09"
 
 from fixedpoint import FixedPoint
 import numpy as np
@@ -129,7 +141,7 @@ class __Dpp_Common:
     def _to_milliseconds(self, value_seconds: float) -> float:
         return value_seconds * 1e3
 
-class Dpp_Shaper(__Dpp_Common):
+class _Dpp_Shaper(__Dpp_Common):
 
     BNA = 10 #: Related to maximum value of peaking time
     BNB = 10 #: Related to maximum value of peaking time + flat top time
@@ -224,7 +236,7 @@ class Dpp_Shaper(__Dpp_Common):
         self.r9_aa20_32_0 = self._compute_r9_aa20()
         self.r10_flags_32_0 = self._compute_r10_flags()
         self.r11_offset_2_32_0 = self._compute_r11_offset_2()
-        self.r12_delay_line_32_0 = self._compute_r12_delay_line()
+        # self.r12_delay_line_32_0 = self._compute_r12_delay_line()
 
         self.params_dict = {
             'r1_b10_32_0'           : self.r1_b10_32_0,
@@ -415,21 +427,61 @@ class Dpp_Shaper(__Dpp_Common):
     def __repr__(self):
         return self.__str__()
     
+class Dpp_Shaper_Slow(_Dpp_Shaper):
+    
+    def __init__(self,
+                sampling_rate : float,
+                tau_d : float,
+                tau_r : float,
+                tau_l : float,
+                tau_pk : float,
+                tau_pk_top: float,
+                poles : int = 2,
+                gain : int = 1,
+                dc_offset_at_filter_input : float = 0.0,
+                dc_offset_at_filter_output : float = 0.0,):
+    
+        super().__init__(sampling_rate, tau_d, tau_r, tau_l, tau_pk, tau_pk_top, poles, gain, dc_offset_at_filter_input, dc_offset_at_filter_output)
+
+    def __str__(self):
+        return f"Pulse shaper slow: {self.params_dict}"
+    
+class Dpp_Shaper_Fast(_Dpp_Shaper):
+    
+    def __init__(self,
+                sampling_rate : float,
+                tau_d : float,
+                tau_r : float,
+                tau_l : float,
+                tau_pk : float,
+                tau_pk_top: float,
+                poles : int = 2,
+                gain : int = 1,
+                dc_offset_at_filter_input : float = 0.0,
+                dc_offset_at_filter_output : float = 0.0,):
+    
+        super().__init__(sampling_rate, tau_d, tau_r, tau_l, tau_pk, tau_pk_top, poles, gain, dc_offset_at_filter_input, dc_offset_at_filter_output)
+
+    def __str__(self):
+        return f"Pulse shaper fast: {self.params_dict}"
 
 class Dpp_Blr_Slow(__Dpp_Common):
 
-    TAU_BLR_CHARGE = 0.001 # In seconds
-    TAU_BLR_DISCHARGE = 0.05 # Seconds
+    # TAU_BLR_CHARGE = 0.001 # In seconds
+    TAU_BLR_CHARGE = 0.010 # In seconds
+    # TAU_BLR_DISCHARGE = 0.05 # Seconds
+    TAU_BLR_DISCHARGE = 0.5 # Seconds
     
     def __init__(self, 
                 sampling_rate : float,
                 tau_pk : float,
                 tau_pk_top: float,
-                blr_speed_conf_bits : int = 3,
+                blr_speed_conf_bits : int = 1,
                 threshold_high : float = 0.00,
                 threshold_low : float = -0.05,
                 threshold_gain : float = 2.0,
                 threshold_low_gain : float = 2.0,
+                blr_enable : bool = True
                 ):
         """
         Baseline restorer parameters computation. Slow BLR module used in the DPP.
@@ -452,6 +504,7 @@ class Dpp_Blr_Slow(__Dpp_Common):
         self.blr_speed_conf_bits = blr_speed_conf_bits
         self.na = self._compute_na(tau_pk=tau_pk)
         self.nb = self._compute_nb(tau_pk=tau_pk, tau_pk_top=tau_pk_top)
+        self.blr_enable = blr_enable
         self.tau_pk = tau_pk #: Peaking time
         self.tau_pk_top = tau_pk_top #: Flat top time
         
@@ -523,7 +576,9 @@ class Dpp_Blr_Slow(__Dpp_Common):
         if self.blr_speed_conf_bits not in [0,1,2,3]:
             raise ValueError(f"Invalid BLR speed configuration bits. Expected [0,1,2,3], got {self.blr_speed_conf_bits}")
         
-        flags = self.blr_speed_conf_bits << 1
+        enable = int(self.blr_enable) << 3 # Bit Offset = 3
+
+        flags = (self.blr_speed_conf_bits << 1) | enable
 
         return FixedPoint_Bin(flags, False, 32, 0)
     
@@ -533,13 +588,15 @@ class Dpp_Blr_Slow(__Dpp_Common):
     def _compute_r4_preset(self):
         PRECISION = 10 # This amount of bits may not be enough for longer tau_pk and tau_pk_top
 
-        preset_look_ahead = 2*self.na + self.nb
-        preset_trail = np.ceil(0.5*self.na)
+        preset_look_ahead = np.ceil((2*self.tau_pk + self.tau_pk_top)/self.t_clk)
         preset_limit = 3*preset_look_ahead
+        preset_trail = np.ceil(0.5*self.na)
+        
 
         preset_look_ahead   = np.clip(preset_look_ahead, 0, 2**PRECISION - 1)
-        preset_trail        = np.clip(preset_trail, 0, 2**PRECISION - 1)
         preset_limit        = np.clip(preset_limit, 0, 2**PRECISION - 1)
+        preset_trail        = np.clip(preset_trail, 0, 2**PRECISION - 1)
+        
 
         preset_hi = FixedPoint_Bin(preset_trail, False, PRECISION, 0)
         preset_mid = FixedPoint_Bin(preset_limit, False, PRECISION, 0)
@@ -548,11 +605,11 @@ class Dpp_Blr_Slow(__Dpp_Common):
         return preset_hi << PRECISION*2 | preset_mid << PRECISION | preset_lo
 
     def _compute_r5_b0(self):
-        b0 = 2*self.t_clk/self.TAU_BLR_CHARGE
+        b0 = self.t_clk/self.TAU_BLR_CHARGE
         return FixedPoint_Bin(b0, False, 0, 32)
     
     def _compute_r6_a1(self):
-        a1 = 1.0-(2*self.t_clk/self.TAU_BLR_DISCHARGE)
+        a1 = 1.0-(self.t_clk/self.TAU_BLR_DISCHARGE)
         return FixedPoint_Bin(a1, False, 0, 32)
 
     def _compute_r7_threshold_low_gain(self):
@@ -993,11 +1050,12 @@ class Dpp_Blr_Fast(__Dpp_Common):
                 sampling_rate : float,
                 tau_pk : float,
                 tau_pk_top: float,
-                blr_speed_conf_bits : int = 2,
+                blr_speed_conf_bits : int = 0,
                 threshold_high : float = 0.0,
                 threshold_low : float = -0.1,
                 threshold_gain : float = 6.0,
                 threshold_low_gain : float = 2.0,
+                blr_enable : bool = True,
                 ):
         """
         Fast BLR module parameters computation. Used in pile-up rejection subsystem.
@@ -1011,6 +1069,7 @@ class Dpp_Blr_Fast(__Dpp_Common):
             threshold_low (float, optional): Low threshold. Defaults to -0.1.
             threshold_gain (float, optional): Gain for high threshold. Defaults to 6.0.
             threshold_low_gain (float, optional): Gain for low threshold. Defaults to 2.0.
+            blr_enable (bool, optional): BLR enabled. Defaults to True.
         """
         super().__init__(sampling_rate = sampling_rate)
         self.threshold_low = threshold_low
@@ -1018,6 +1077,7 @@ class Dpp_Blr_Fast(__Dpp_Common):
         self.threshold_gain = threshold_gain
         self.threshold_low_gain = threshold_low_gain
         self.blr_speed_conf_bits = blr_speed_conf_bits
+        self.blr_enable = blr_enable
         self.na = self._compute_na(tau_pk=tau_pk)
         self.nb = self._compute_nb(tau_pk=tau_pk, tau_pk_top=tau_pk_top)
 
@@ -1076,7 +1136,9 @@ class Dpp_Blr_Fast(__Dpp_Common):
         if self.blr_speed_conf_bits not in [0,1,2,3]:
             raise ValueError(f"Invalid BLR speed configuration bits. Expected [0,1,2,3], got {self.blr_speed_conf_bits}")
         
-        flags = self.blr_speed_conf_bits << 1
+        enable = int(self.blr_enable) << 3 # Bit Offset = 3
+
+        flags = (self.blr_speed_conf_bits << 1) | enable
 
         return FixedPoint_Bin(flags, False, 32, 0)
     
@@ -1677,31 +1739,33 @@ class Dpp_Variable_Gain_Amplifier:
         return self.__str__()
         
 
-class Dpp_Parameters:
+class DppParameters:
     def __init__(self, sampling_rate : float,
                  tau_d : float,
                  tau_r : float,
-                 shaper_s_tau_pk : float,
-                 shaper_s_tau_pk_top : float,
-                 shaper_f_tau_pk : float,
-                 shaper_f_tau_pk_top : float,
-                 shaper_s_gain : float = 2.0,
-                 shaper_f_gain : float = 2.0,
+                 shaper_s_tau_pk : float = 2.0e-6,
+                 shaper_s_tau_pk_top : float = 1.0e-6,
+                 shaper_f_tau_pk : float = 0.3e-6,
+                 shaper_f_tau_pk_top : float = 0,
+                 shaper_s_gain : float = 1.0,
+                 shaper_f_gain : float = 1.0,
                  blr_s_threshold_high : float = 0.0,
                  blr_s_threshold_low : float = -0.05,
-                 blr_s_threshold_gain : float = 2.0,
-                 blr_s_threshold_low_gain : float = 2.0,
+                 blr_s_threshold_gain : float = 2.5,
+                 blr_s_threshold_low_gain : float = 50.0,
+                 blr_s_enable : bool = True,
                  blr_f_threshold_high : float = 0.0,
                  blr_f_threshold_low : float = -0.05,
                  blr_f_threshold_gain : float = 1.5,
-                 blr_f_threshold_low_gain : float = 6.0,
+                 blr_f_threshold_low_gain : float = 2.0,
+                 blr_f_enable : bool = False,
                  pkd_blanking_time_factor = 0.9,
                  pkd_time_over_threshold_factor = 0.44,
-                 pur_guard_time_factor=1.7,
-                 pur_enable=True,
+                 pur_guard_time_factor=1.5,
+                 pur_enable = True,
                  pkd_s_x_min = 0.01,
                  pkd_s_x_max = 1.99,
-                 pkd_f_x_min = 0.003,
+                 pkd_f_x_min = 0.025,
                  pkd_f_x_max = 1.957,
                  invert_pulse : bool = False,
                  smoothing_factor : int = 1,
@@ -1715,13 +1779,13 @@ class Dpp_Parameters:
                  scope_clear : bool = True,
                  scope_downsample : int = 1,
                  scope_sampling_mode_flag : int = 1,
-                 scope_mux_ch1 : int = 0,
-                 scope_mux_ch2 : int = 0,
+                 scope_mux_ch1 : int = 3,
+                 scope_mux_ch2 : int = 1,
                  timers_preset : int = 10000000,
                  timers_auto_mode : bool = False,
-                 timers_a_live_time : bool = True,
+                 timers_a_live_time : bool = False,
                  timers_b_live_time : bool = False,
-                 timers_c_live_time : bool = False,
+                 timers_c_live_time : bool = True,
                  timers_a_enable : bool = True,
                  timers_b_enable : bool = False,
                  timers_c_enable : bool = True,
@@ -1741,23 +1805,63 @@ class Dpp_Parameters:
             sampling_rate (float): Sampling rate of the ADC
             tau_d (float): Decay time constant of the detector (in seconds)
             tau_r (float): Rise time constant of the detector (in seconds)
-            tau_pk (float): Peaking time (in seconds)
-            tau_pk_top (float): Flat top time (in seconds)
-            tau_pk_fast (float): Peaking time for fast shaper (in seconds)
-            tau_pk_top_fast (float): Flat top time for fast shaper (in seconds)
-            threshold_gain (float, optional): Gain for high threshold. Defaults to 2.0.
-            threshold_gain_fast (float, optional): Gain for high threshold for fast peak detector. Defaults to 1.5.
-            threshold_low_gain (float, optional): Gain for low threshold. Defaults to 2.0.
-            blanking_time_factor (float, optional): Blanking time factor. Defaults to 0.9.
-            time_over_threshold_factor (float, optional): Time over threshold factor. Defaults to 0.44.
-            x_min (float, optional): Minimum value for the output. Defaults to 0.01.
-            x_max (float, optional): Maximum value for the output. Defaults to 1.99.
-            invert_pulse (bool, optional): Invert original pulse before shaping. Defaults to False.
-            dc_offset (float, optional): Signal input DC offset. Defaults to -0.77.
-            poles (int, optional): Number of poles in the pulse shaper filter. Defaults to 2.
-            tau_l (float, optional): Long undershoot constant (in seconds, for PMT only). Defaults to 50e-6.
+            shaper_s_tau_pk (float, optional): Peaking time for slow shaper (in seconds). Defaults to 2.0e-6.
+            shaper_s_tau_pk_top (float, optional): Flat top time for slow shaper (in seconds). Defaults to 1.0e-6.
+            shaper_f_tau_pk (float, optional): Peaking time for fast shaper (in seconds). Defaults to 0.3e-6.
+            shaper_f_tau_pk_top (float, optional): Flat top time for fast shaper (in seconds). Defaults to 0.
+            shaper_s_gain (float, optional): Gain for slow shaper. Defaults to 1.0.
+            shaper_f_gain (float, optional): Gain for fast shaper. Defaults to 1.0.
+            blr_s_threshold_high (float, optional): High threshold for slow baseline restorer (in Volts). Defaults to 0.0.
+            blr_s_threshold_low (float, optional): Low threshold for slow baseline restorer (in Volts). Defaults to -0.05.
+            blr_s_threshold_gain (float, optional): Gain for high threshold for slow baseline restorer. Defaults to 2.5.
+            blr_s_threshold_low_gain (float, optional): Gain for low threshold for slow baseline restorer. Defaults to 50.0.
+            blr_s_enable (bool, optional): Enable slow baseline restorer. Defaults to True.
+            blr_f_threshold_high (float, optional): High threshold for fast baseline restorer (in Volts). Defaults to 0.0.
+            blr_f_threshold_low (float, optional): Low threshold for fast baseline restorer (in Volts). Defaults to -0.05.
+            blr_f_threshold_gain (float, optional): Gain for high threshold for fast baseline restorer. Defaults to 1.5.
+            blr_f_threshold_low_gain (float, optional): Gain for low threshold for fast baseline restorer. Defaults to 2.0.
+            blr_f_enable (bool, optional): Enable fast baseline restorer. Defaults to False.
+            pkd_blanking_time_factor (float, optional): Blanking time factor for peak detector. Defaults to 0.9.
+            pkd_time_over_threshold_factor (float, optional): Time over threshold factor for peak detector. Defaults to 0.44.
+            pur_guard_time_factor (float, optional): Guard time factor for the pile-up rejector. Defaults to 1.5.
+            pur_enable (bool, optional): Enable the pile-up rejector. Defaults to True.
+            pkd_s_x_min (float, optional): Minimum value (LLD) for slow peak detector (in Volts). Defaults to 0.01.
+            pkd_s_x_max (float, optional): Maximum value (ULD) for slow peak detector (in Volts). Defaults to 1.99.
+            pkd_f_x_min (float, optional): Minimum value (LLD) for fast peak detector (in Volts). Defaults to 0.025.
+            pkd_f_x_max (float, optional): Maximum value (ULD) for fast peak detector (in Volts). Defaults to 1.957.
+            invert_pulse (bool, optional): Invert pulse polarity. Defaults to False.
+            smoothing_factor (int, optional): Smoothing factor (moving average). Valid 1, 2, 4, 8. Defaults to 1.
+            dc_offset (float, optional): Input signal DC offset (in Volts). Range [-2.0, 2.0]. Defaults to -0.77.
+            poles (int, optional): Number of poles for the shaper to compensate PMT long tail. Defaults to 2 (SiPM).
+            tau_l (float, optional): Long undershoot constant for PMT (in seconds). Defaults to 50.0e-6.
+            scope_bram_size (int, optional): Size of the scope buffer (in samples). Defaults to 2048.
+            scope_threshold (float, optional): Scope threshold (in Volts). Defaults to 0.04.
+            scope_delay (float, optional): Scope delay (in samples). Defaults to 1000.
+            scope_enabled (bool, optional): Enable scope. Defaults to True.
+            scope_clear (bool, optional): Clear scope buffer before first stream. Defaults to True.
+            scope_downsample (int, optional): Scope downsample factor. Defaults to 1.
+            scope_sampling_mode_flag (bool, optional): Scope sampling mode flag. Defaults to 1. See documentation
+            scope_mux_ch1 (int, optional): Scope mux channel 1. Defaults to 3.
+            scope_mux_ch2 (int, optional): Scope mux channel 2. Defaults to 2.
+            timers_preset (int, optional): Timer collection time (in milliseconds). Defaults to 10000000.
+            timers_auto_mode (bool, optional): Timer auto mode (ping-ping buffer in MCA). Defaults to False.
+            timers_a_live_time (bool, optional): Measure Live Time with Timer A (instead of Real Time). Defaults to False.
+            timers_b_live_time (bool, optional): Measure Live Time with Timer B (instead of Real Time). Defaults to False.
+            timers_c_live_time (bool, optional): Measure Live Time with Timer C (instead of Real Time). Defaults to True.
+            timers_a_enable (bool, optional): Enable Timer A. Defaults to True.
+            timers_b_enable (bool, optional): Enable Timer B. Defaults to False.
+            timers_c_enable (bool, optional): Enable Timer C. Defaults to True.
+            timers_a_clear (bool, optional): Clear Timer A before data acquisition. Defaults to False.
+            timers_b_clear (bool, optional): Clear Timer B before data acquisition. Defaults to False.
+            timers_c_clear (bool, optional): Clear Timer C before data acquisition. Defaults to False.
+            high_voltage (float, optional): High voltage output for PMT (in Volts). Defaults to 0.0.
+            vga_board_version (str, optional): Board version, used to configure variable-gain amplifier. Defaults to "B".
+            vga_gain_fine (float, optional): VGA fine gain. Defaults to 1.
+            vga_gain_coarse (float, optional): VGA coarse gain. Defaults to 1.
+
+
         """
-        self.shaper_slow = Dpp_Shaper(
+        self.shaper_slow = Dpp_Shaper_Slow(
             sampling_rate=sampling_rate,
             tau_d=tau_d,
             tau_r=tau_r,
@@ -1775,7 +1879,8 @@ class Dpp_Parameters:
             threshold_low=blr_s_threshold_low,
             threshold_high=blr_s_threshold_high,
             threshold_gain=blr_s_threshold_gain,
-            threshold_low_gain=blr_s_threshold_low_gain
+            threshold_low_gain=blr_s_threshold_low_gain,
+            blr_enable=blr_s_enable
         )
 
         self.scope = Dpp_Scope(
@@ -1825,7 +1930,7 @@ class Dpp_Parameters:
             smoothing_factor=smoothing_factor
         )
 
-        self.shaper_fast = Dpp_Shaper(
+        self.shaper_fast = Dpp_Shaper_Fast(
             sampling_rate=sampling_rate,
             tau_d=tau_d,
             tau_r=tau_r,
@@ -1843,7 +1948,8 @@ class Dpp_Parameters:
             threshold_low=blr_f_threshold_low,
             threshold_high=blr_f_threshold_high,
             threshold_gain=blr_f_threshold_gain,
-            threshold_low_gain=blr_f_threshold_low_gain
+            threshold_low_gain=blr_f_threshold_low_gain,
+            blr_enable=blr_f_enable
         )
 
         self.pk_detector_fast = Dpp_Pk_Detector_Fast(
@@ -2135,22 +2241,24 @@ if __name__ == '__main__':
     TAU_L = 50e-6   #: PMT-only! Long decay constant (in seconds)
     SHAPER_S_TAU_PK = 3.0e-6 #: Pulse shaper (slow) peaking time (in seconds)
     SHAPER_S_TAU_PK_TOP = 0.0e-6 #: Pulse shaper (slow) flat-top (in seconds)
-    SHAPER_F_TAU_PK = 0.2e-6 # : Pulse shaper (fast) peaking time (in seconds)
+    SHAPER_F_TAU_PK = 0.3e-6 # : Pulse shaper (fast) peaking time (in seconds)
     SHAPER_F_TAU_PK_TOP = 0.0e-6 #: Pulse shaper (fast) flat-top (in seconds)
     POLES = 2   #: Number of poles in the pulse shaper filter (SiPM: 2, PMT: 3)
     SHAPER_S_GAIN = 1.0 #: Digital gain of the slow pulse shaper filter
     SHAPER_F_GAIN = 1.0 #: Digital gain of the fast pulse shaper filter
-    DC_OFFSET = -0.77 #: ADC input signal DC offset (in Volts)
+    DC_OFFSET = -0.03 #: ADC input signal DC offset (in Volts)
     INVERT_PULSE = False #: Is the original pulse inverted before shaping?
     SMOOTHING_FACTOR = 2 # Moving averaging Formatter flags (1, 2, 4, or 8)
     BLR_S_THRESHOLD_HIGH = 0.00 #: BLR slow clamping threshold high (in Volts)
     BLR_S_THRESHOLD_LOW = -0.05 #: BLR slow campling threshold low (in Volts)
     BLR_S_THRESHOLD_GAIN = 3.0 #: Coarse gain of the slow baseline restorer
     BLR_S_THRESHOLD_LOW_GAIN = 50 #: Fine gain of the slow baseline restorer
+    BLR_S_ENABLE = True #: Enable the BLR slow module
     BLR_F_THRESHOLD_HIGH = 0.00 #: BLR fast clamping threshold high (in Volts)
     BLR_F_THRESHOLD_LOW = -0.05 #: BLR fast campling threshold low (in Volts)
     BLR_F_THRESHOLD_GAIN = 6.0 #: Coarse gain of the fast baseline restorer
     BLR_F_THRESHOLD_LOW_GAIN = 2.0 #: Fine gain of the fast baseline restorer
+    BLR_F_ENABLE = False #: BLR Fast module disabled by default
     PKD_BLANKING_TIME_FACTOR = 0.9 #: Peak detector blanking time factor
     PKD_TIME_OVER_THRESHOLD_FACTOR = 0.44 #: Peak detector time-over-threshold factor
     PUR_GUARD_TIME_FACTOR = 1.7 #: Pileup rejector guard time factor
@@ -2186,7 +2294,7 @@ if __name__ == '__main__':
     
 
     # Initializing the DPP parameters class instance
-    dpp_parameters = Dpp_Parameters(
+    dpp_parameters = DppParameters(
         sampling_rate=SAMPLING_RATE,
         tau_d=TAU_D,
         tau_r=TAU_R,
@@ -2200,10 +2308,12 @@ if __name__ == '__main__':
         blr_s_threshold_low=BLR_S_THRESHOLD_LOW,
         blr_s_threshold_gain=BLR_S_THRESHOLD_GAIN,
         blr_s_threshold_low_gain=BLR_S_THRESHOLD_LOW_GAIN,
+        blr_s_enable=BLR_S_ENABLE,
         blr_f_threshold_high=BLR_F_THRESHOLD_HIGH,
         blr_f_threshold_low=BLR_F_THRESHOLD_LOW,
         blr_f_threshold_gain=BLR_F_THRESHOLD_GAIN,
         blr_f_threshold_low_gain=BLR_F_THRESHOLD_LOW_GAIN,
+        blr_f_enable=BLR_F_ENABLE,
         pkd_blanking_time_factor=PKD_BLANKING_TIME_FACTOR,
         pkd_time_over_threshold_factor=PKD_TIME_OVER_THRESHOLD_FACTOR,
         pur_guard_time_factor=PUR_GUARD_TIME_FACTOR,
