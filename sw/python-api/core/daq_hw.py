@@ -1,22 +1,50 @@
+"""
+Module: daq_hw.py
+Description: Data Acquisition Hardware (DAQ) management class over UART.
+
+Revisions:
+    1.0.0 - Initial release (2026-06-10) - I. Morales
+"""
+
+from __future__ import annotations
+
+__all__ = ["DaqHw"]
+__version__ = "1.0.0"
+__author__ = "I. Morales"
+__date__ = "2026-06-10"
+
 from serial import Serial
 from serial.tools import list_ports
 import os
 
 class DaqHw(Serial):
+    """Data Acquisition Hardware (DAQ) management class over UART.
+
+    Inherits from `Serial` and provides utility methods to filter out JTAG 
+    channels and automatically detect ports based on Vendor ID (VID) and 
+    Product ID (PID).
+
+    Attributes:
+        DEFAULT_VID (str): Default Vendor ID for the USB-UART FTDI chip.
+        DEFAULT_PID (str): Default Product ID for the CMOD A7 board.
+        DEFAULT_BAUDRATE (int): Default serial baud rate (115200).
+    """
 
     #: Use these default values for the USB-UART FTDI chip in the CMOD A7 board
     DEFAULT_VID = "0403"
     DEFAULT_PID = "6010"
+    DEFAULT_BAUDRATE = 115200
 
     def _disregard_jtag(self):
-        """
-        Returns a list of UART-only ports associated to /dev/ttyUSB or /dev/ttyACM interfaces.
-        Disregards any JTAG channel available in a single USB-UART FTDI chip.
+        """Finds and filters UART-only ports while ignoring JTAG channels.
 
-        Returns
-        -------
-        list
-            A list of UART-only ports
+        Scans the `/dev/serial/by-id/` directory for interfaces associated 
+        with `/dev/ttyUSB` or `/dev/ttyACM` devices, disregarding any 
+        JTAG instances present on the FTDI chip.
+
+        Returns:
+            list: A sorted list of strings containing absolute paths to 
+            the UART-only ports.
         """
         
         base_path = "/dev/serial/by-id/"
@@ -41,21 +69,21 @@ class DaqHw(Serial):
 
 
     def find_port(self, vid : int, pid : int) -> str:
-        """
-        Finds the serial port of the target device. If unsure of
-        the VID and PID, use the DEFAULT_VID and DEFAULT_PID class attributes.
+        """Finds the target device's serial port based on its VID and PID.
 
-        Parameters
-        ----------
-        vid : int
-            The vendor ID of the target device
-        pid : int
-            The product ID of the target device
+        If you are uncertain about the specific values, use the `DEFAULT_VID` 
+        and `DEFAULT_PID` class attributes.
 
-        Returns
-        -------
-        str
-            The serial port of the target device
+        Args:
+            vid (int | str): The Vendor ID of the target device (can be an 
+                integer or a hexadecimal string).
+            pid (int | str): The Product ID of the target device (can be an 
+                integer or a hexadecimal string).
+
+        Returns:
+            str | list | None: A string containing the port name if a single 
+            device is found, a list of strings if multiple devices match, 
+            or None if no valid hardware is found.
         """
         
         # Convert to integers in case hexadecimal text is passed as parameter
@@ -87,36 +115,26 @@ class DaqHw(Serial):
         return None
     
     def open_port(self, port_name : str, baudrate : int) -> Serial:
-        """
-        Opens a serial port
+        """Opens a specific serial port.
 
-        Parameters
-        ----------
-        port_name : str
-            The serial port to open
-        baudrate : int
-            The baudrate of the serial port
+        Args:
+            port_name (str): The identifier or path of the serial port to open.
+            baudrate (int): The transmission speed (baud rate) for the port.
 
-        Returns
-        -------
-        Serial
-            The instance of the opened serial port
+        Returns:
+            Serial: The initialized and opened serial port instance.
         """
         return super().__init__(port_name, baudrate)
     
     def close_port(self, port_instance : Serial) -> bool:
-        """
-        Closes a serial port
+        """Closes an active serial port instance.
 
-        Parameters
-        ----------
-        port_instance : Serial
-            The instance of the serial port to close
+        Args:
+            port_instance (Serial): The instance of the serial port to close.
 
-        Returns
-        -------
-        bool
-            True if the port was closed succesfully. False if it was already closed
+        Returns:
+            bool: True if the port was successfully closed, False if it was 
+            already closed or inactive.
         """
         if port_instance.is_open:
             port_instance.close()
@@ -125,15 +143,13 @@ class DaqHw(Serial):
 
 if __name__ == "__main__":
 
-    ## This is a validation code that should not be run in production
+    ## The following is a validation code that should not
+    # be run in production. Meant for development only.
     daq = DaqHw()
 
-    ## Taking the default VID and PID for the CMOD A7 development board
-    vid = daq.DEFAULT_VID
-    pid = daq.DEFAULT_PID
-
     ## Finding the port corresponding to the device we are looking for
-    port_name = daq.find_port(vid, pid)
+    ## Taking the default VID and PID for the CMOD A7 development board
+    port_name = daq.find_port(daq.DEFAULT_VID, daq.DEFAULT_PID)
     print(f"DAQ found in port: {port_name}")
 
     ## Checking if the port can be opened and closed
