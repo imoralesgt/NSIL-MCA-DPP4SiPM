@@ -22,7 +22,7 @@ def target_port():
     if not port_name:
         pytest.skip(
             f"HIL Setup Missing: No DAQ hardware found matching "
-            f"VID {finder.DEFAULT_VID} and PID {finder.DEFAULT_PID}. Skipping HIL suite."
+            f"VID {finder.DEFAULT_VID} and PID {finder.DEFAULT_PID}. Skipping HIL test suite."
         )
         
     if isinstance(port_name, list):
