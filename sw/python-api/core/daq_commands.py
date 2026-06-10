@@ -62,7 +62,7 @@ class DaqCommands:
         self.port_name = port_name
         self.baudrate = baudrate
         
-        logger.info("Initializing underlying Dpp_Parameters submodules framework...")
+        logger.info("Initializing underlying Dpp_Parameters submodules...")
         logger.debug("[DEBUG START]: Passing arguments to Dpp_Parameters constructor...")
         logger.debug(f"[DEBUG PARAM]: sampling_rate={sampling_rate}, tau_d={tau_d}, tau_r={tau_r}")
         logger.debug(f"[DEBUG KWARGS]: {dpp_kwargs}")
@@ -78,6 +78,9 @@ class DaqCommands:
         except Exception as e:
             logger.error(f"[DEBUG FAULT]: DppParameters constructor threw an exception: {e}")
             raise e
+        
+        self.dpp_initialize()
+        logger.info("Dpp_Parameters submodules initialized successfully!")
         
     def _find_port(self):
         """Discovers and returns the active serial port name of the connected DAQ.
@@ -272,6 +275,75 @@ class DaqCommands:
         """
         response = self._send_ascii_cmd(DaqCliCommands.CLEAR_SPECTRUM, str(segment_index))
         return f"!{DaqCliCommands.CLEAR_SPECTRUM.value}" in response
+
+    def dpp_initialize(self) -> bool:
+        """Initializes all the DPP submodules in the DAQ with the provided
+        constructor arguments.
+        
+        Returns:
+            bool: True if the DPP initialization was successful
+        """
+        logger.info("Initializing pulse shaper slow")
+        if not self.set_dpp_params(DppSubmodules.PULSE_SHAPER_SLOW):
+            raise DaqException("DPP initialization failed: Pulse Shaper Slow module could not be configured")
+        logger.info("DPP: Pulse shaper slow initialization OK.")
+
+        logger.info("Initializing peak detector slow")
+        if not self.set_dpp_params(DppSubmodules.PEAK_DETECTOR_SLOW):
+            raise DaqException("DPP initialization failed: Peak Detector Slow module could not be configured")
+        logger.info("DPP: Peak detector slow initialization OK.")
+
+        logger.info("Initializing oscilloscope")
+        if not self.set_dpp_params(DppSubmodules.SCOPE):
+            raise DaqException("DPP initialization failed: Oscilloscope module could not be configured")
+        logger.info("DPP: Oscilloscope initialization OK.")
+
+        logger.info("Initializing timers")
+        if not self.set_dpp_params(DppSubmodules.TIMERS):
+            raise DaqException("DPP initialization failed: Timers module could not be configured")
+        logger.info("DPP: Timers initialization OK.")
+
+        logger.info("Initializing baseline restorer slow")
+        if not self.set_dpp_params(DppSubmodules.BASELINE_RESTORER_SLOW):
+            raise DaqException("DPP initialization failed: Baseline Restorer Slow module could not be configured")
+        logger.info("DPP: Baseline restorer slow initialization OK.")
+
+        logger.info("Initializing scope mux")
+        if not self.set_dpp_params(DppSubmodules.SCOPE_MUX):
+            raise DaqException("DPP initialization failed: Scope Mux module could not be configured")
+        logger.info("DPP: Scope Mux initialization OK.")
+
+        logger.info("Initializing formatter")
+        if not self.set_dpp_params(DppSubmodules.FORMATTER):
+            raise DaqException("DPP initialization failed: Formatter module could not be configured")
+        logger.info("DPP: Formatter initialization OK.")
+
+        logger.info("Initializing pulse shaper fast")
+        if not self.set_dpp_params(DppSubmodules.PULSE_SHAPER_FAST):
+            raise DaqException("DPP initialization failed: Pulse Shaper Fast module could not be configured")
+        logger.info("DPP: Pulse shaper fast initialization OK.")
+
+        logger.info("Initializing baseline restorer fast")
+        if not self.set_dpp_params(DppSubmodules.BASELINE_RESTORER_FAST):
+            raise DaqException("DPP initialization failed: Baseline Restorer Fast module could not be configured")
+        logger.info("DPP: Baseline restorer fast initialization OK.")
+
+        logger.info("Initializing peak detector fast")
+        if not self.set_dpp_params(DppSubmodules.PEAK_DETECTOR_FAST):
+            raise DaqException("DPP initialization failed: Peak Detector Fast module could not be configured")
+        logger.info("DPP: Peak detector fast initialization OK.")
+
+        logger.info("Initializing pileup rejector")
+        if not self.set_dpp_params(DppSubmodules.PILEUP_REJECTOR):
+            raise DaqException("DPP initialization failed: Pileup Rejector module could not be configured")
+        logger.info("DPP: Pileup rejector initialization OK.")
+
+        logger.info("Initializing variable gain amplifier (VGA)")
+        if not self.set_dpp_params(DppSubmodules.VARIABLE_GAIN_AMPLIFIER):
+            raise DaqException("DPP initialization failed: Variable Gain Amplifier (VGA) module could not be configured")
+        logger.info("DPP: Variable gain amplifier (VGA) initialization OK.")
+
+        return True
 
     def set_dpp_params(self, submodule: DppSubmodules, dpp_instance: DppParameters = None) -> bool:
         """Uploads pre-calculated 32-bit unsigned parameters to hardware registers in the DAQ.
