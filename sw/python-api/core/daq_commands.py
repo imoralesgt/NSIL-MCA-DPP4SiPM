@@ -15,6 +15,11 @@ import time
 
 # Dedicated global logger for high-level operations and serial transactions
 logger = logging.getLogger("DAQ_MCA_API")
+logging.basicConfig(filename='daq_mca.log',
+                    encoding='utf-8',
+                    level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(name)s: %(message)s',
+                    force=True)
 
 class DaqException(Exception):
     """Base exception for all DAQ CLI execution and communication errors."""
@@ -44,18 +49,23 @@ class DaqCommands:
     SCOPE_LENGTH = 2048
     BYTES_IN_WORD = 4
 
-    def __init__(self, port_name: str, baudrate: int = 115200, 
+    def __init__(self, port_name: str = None, baudrate: int = 115200, 
                  sampling_rate: float = 50e6, tau_d: float = 1.145e-6, tau_r: float = 0.220e-6, 
                  **dpp_kwargs):
         """Prepares session state elements and encapsulates the DPP parameter library."""
+        self.daq = DaqHw(port=None) 
+        if port_name is None:
+            logger.info("No serial port name provided, attempting to auto-discover...")
+            port_name = self._find_port()
+            logger.info(f"Discovered DAQ hardware at port {port_name}")
+        
         self.port_name = port_name
         self.baudrate = baudrate
-        self.daq = DaqHw(port=None) 
         
         logger.info("Initializing underlying Dpp_Parameters submodules framework...")
-        logger.info("[DEBUG START]: Passing arguments to Dpp_Parameters constructor...")
-        logger.info(f"[DEBUG PARAM]: sampling_rate={sampling_rate}, tau_d={tau_d}, tau_r={tau_r}")
-        logger.info(f"[DEBUG KWARGS]: {dpp_kwargs}")
+        logger.debug("[DEBUG START]: Passing arguments to Dpp_Parameters constructor...")
+        logger.debug(f"[DEBUG PARAM]: sampling_rate={sampling_rate}, tau_d={tau_d}, tau_r={tau_r}")
+        logger.debug(f"[DEBUG KWARGS]: {dpp_kwargs}")
         
         try:
             self.dpp = DppParameters(
@@ -64,17 +74,46 @@ class DaqCommands:
                 tau_r=tau_r,
                 **dpp_kwargs
             )
-            logger.info("[DEBUG END]: DppParameters object created successfully!")
+            logger.debug("[DEBUG END]: DppParameters object created successfully!")
         except Exception as e:
             logger.error(f"[DEBUG FAULT]: DppParameters constructor threw an exception: {e}")
             raise e
+        
+    def _find_port(self):
+        """Discovers and returns the active serial port name of the connected DAQ.
+        
+        Args:
+            None
 
-    def open(self, boot_delay: float = 0.5):
-        """Establishes a long-lived persistent connection session to the target hardware."""
+        Returns:
+            str: The serial port name
+
+        Raises:
+            DaqException: If no DAQ hardware is found
+
+        """
+        port_name = self.daq.find_port(self.daq.DEFAULT_VID, self.daq.DEFAULT_PID)
+
+        if not port_name:
+            raise DaqException(f"No DAQ hardware found matching VID {self.daq.DEFAULT_VID} and PID {self.daq.DEFAULT_PID}.")
+
+        if isinstance(port_name, list):
+            # Fallback to the first available hardware link if multiple are found
+            port_name = port_name[0]
+
+        return port_name
+
+    def open(self, boot_delay: float = 0.5, timeout: float = 0.2):
+        """Establishes a long-lived persistent connection session to the target hardware.
+        
+        Args:
+            boot_delay (float): Number of seconds to wait for the hardware to boot up.
+            timeout (float): Number of seconds to wait for a response from the hardware.
+        """
         if not self.daq.is_open:
             logger.info(f"[SESSION]: Opening persistent channel -> {self.port_name}")
             self.daq.open_port(self.port_name, self.baudrate)
-            self.daq.timeout = 2.0
+            self.daq.timeout = timeout
             
             if boot_delay > 0:
                 logger.info(f"[SESSION]: Waiting {boot_delay} s for hardware bootloader stabilization...")
@@ -98,7 +137,11 @@ class DaqCommands:
 
     @contextmanager
     def _connection_transaction(self):
-        """Context manager hook isolating the active connection lifecycle state."""
+        """Context manager hook isolating the active connection lifecycle state.
+        
+        Raises:
+            Exception: If an exception is encountered during the transaction
+        """
         self.open()  # Ensure connection is up and hot
         try:
             yield self.daq
@@ -107,7 +150,18 @@ class DaqCommands:
             raise e
 
     def _send_ascii_cmd(self, cmd: DaqCliCommands, params: str = "") -> str:
-        """Transmits standard text command frames within a live port instance transaction."""
+        """Transmits standard text command frames within a live port instance transaction.
+        
+        Args:
+            cmd (DaqCliCommands): The command code to send. See `DaqCliCommands` in `daq_constants.py`.
+            params (str): The command parameters to send. See the documentation for the available arguments.
+
+        Returns:
+            str: The response received from the DAQ
+            
+        Raises:
+            Exception: If an error is encountered during the transaction
+        """
         cmd_code = cmd.value
         if cmd == DaqCliCommands.PING:
             packet_str = f"{cmd_code}\r"
@@ -119,7 +173,7 @@ class DaqCommands:
             logger.info("[TX RAW BUS]: Sending packet -> %r", packet_str)
             active_bus.write(packet_str.encode('ascii'))
 
-            logger.info("[RX RAW BUS]: Awaiting data from hardware (timeout=2.0s)...")
+            logger.info(f"[RX RAW BUS]: Awaiting data from hardware (timeout= {self.daq.timeout} s)...")
             response_bytes = active_bus.read_until(b'\n\r')
 
             response = response_bytes.decode('ascii').strip()
@@ -140,47 +194,96 @@ class DaqCommands:
 
         return response
 
-    def ping(self) -> bool:
+    def __ping(self) -> bool: ## Not implemented in hardware yet
         """Performs live diagnostic heartbeat checking."""
         response = self._send_ascii_cmd(DaqCliCommands.PING)
         return DaqCliCommands.PING.value in response
 
     def get_version(self) -> str:
-        """Retrieves the system firmware version string from the hardware."""
+        """Retrieves the system firmware version string from the hardware.
+        
+        Returns:
+            str: The firmware version string
+        """
         response = self._send_ascii_cmd(DaqCliCommands.GET_VERSION)
         return response.replace(f"!{DaqCliCommands.GET_VERSION.value}", "").strip()
 
     def get_serial(self) -> str:
-        """Retrieves the system serial number string from the hardware."""
+        """Retrieves the system serial number string from the hardware.
+        
+        Returns:
+            str: The serial number of the MCA board
+        """
         response = self._send_ascii_cmd(DaqCliCommands.GET_SERIAL)
         return response.replace(f"!{DaqCliCommands.GET_SERIAL.value}", "").strip()
 
     def data_acquisition_start(self) -> bool:
-        """Starts the spectrum acquisition in the hardware."""
+        """Starts the spectrum acquisition in the DAQ. This method should be
+        called once to start the data acquisition process. For a precise
+        spectrum acquisition time, leverage the timers to set the desired
+        live or real time collection time. 
+
+        Avoid using the `data_acquisition_stop` method, since it will also
+        clear the spectrum data. 
+        
+        The spectrum can be safely collected while the acquisition
+        is in progress.
+        
+        Returns:
+            bool: True if the operation was successful
+        """
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "1")
         return response is not None
 
     def data_acquisition_stop(self) -> bool:
-        """Stops the spectrum acquisition in the hardware."""
+        """Stops the spectrum acquisition in the DAQ. Spectrum
+        data is cleared in the process. For a precise stop, configure
+        the timers to the desired live or real time collection time.
+
+        Use this method only if the whole system is meant to be stopped, 
+        such as when shutting down the system (not required) or fine-tuning
+        power saving features. Do not use this method otherwise.
+        
+        Returns:
+            bool: True if the operation was successful
+        """
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "0")
         return response is not None
 
     def timers_reset(self) -> bool:
-        """Resets the timers in the hardware board."""
+        """Resets the timers in the DAQ. This method should be called before
+        starting the data acquisition process.
+
+        Returns:
+            bool: True if the operation was successful
+        """
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "4")
         return response is not None
 
     def clear_spectrum(self, segment_index: int = 0) -> bool:
-        """Erases memory histograms safely using $CS instructions."""
+        """Erases memory contents of the histogram.
+        
+        Args:
+            segment_index (int): Segment index to clear. Default is 0. The 
+                current firmware version only supports this segment, anyways.
+        
+        Returns:
+            bool: True if the spectrum clearing operation was successful
+        """
         response = self._send_ascii_cmd(DaqCliCommands.CLEAR_SPECTRUM, str(segment_index))
         return f"!{DaqCliCommands.CLEAR_SPECTRUM.value}" in response
 
     def set_dpp_params(self, submodule: DppSubmodules, dpp_instance: DppParameters = None) -> bool:
-        """Uploads pre-calculated 32-bit parameters straight to hardware registers.
+        """Uploads pre-calculated 32-bit unsigned parameters to hardware registers in the DAQ.
 
         Args:
-            submodule (DppSubmodules): Target hardware register block enum member.
-            dpp_instance (DppParameters, optional): A newly instantiated parameters context.
+            submodule (DppSubmodules): Target hardware register block enum member
+              (PULSE_SHAPER_SLOW, TIMERS, etc.).
+            dpp_instance (DppParameters, optional): Only if a a newly instantiated parameters
+              context with pre-calculated values is required. Do not pass this argument otherwise.
+
+        Returns:
+            bool: True if the operation was successful
         """
         if dpp_instance is not None:
             self.dpp = dpp_instance
@@ -192,13 +295,13 @@ class DaqCommands:
         # Invoke the correct '_daq' layout array retrieval function
         parameter_data = getter_func()
         
-        # Handle dict value collection or pass down direct lists safely
+        # Handle dict value collection (params_***) or pass down direct lists (params_***_daq) safely
         if isinstance(parameter_data, dict):
             register_array = list(parameter_data.values())
         else:
             register_array = list(parameter_data)
 
-        # Serialize the integer values into a clean space-delimited text sequence
+        # Serialize the integer values into a space-delimited text sequence
         serialized_string = " ".join(str(int(reg_val)) for reg_val in register_array)
         arguments = f"{submodule.group_index} {serialized_string}"
 
@@ -206,14 +309,36 @@ class DaqCommands:
         return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
 
 
-    def get_dpp_params(self, submodule: DppSubmodules) -> List[int]:
-        """Queries active register data contents directly from hardware lanes."""
+    def get_dpp_params(self, submodule: DppSubmodules) -> List[int]:        
+        """Queries active DPP register values from the DAQ.
+
+        Args:
+            submodule (DppSubmodules): Target hardware register block enum member
+              (PULSE_SHAPER_SLOW, TIMERS, etc.). See `DppSubmodules` in
+              `daq_constants.py`.
+
+        Returns:
+            List[int]: List of 32-bit unsigned integer values
+        """
         response = self._send_ascii_cmd(DaqCliCommands.GET_DPP_PARAMS, str(submodule.group_index))
         payload_data = response.replace(f"!{DaqCliCommands.GET_DPP_PARAMS.value}", "").strip()
         return [int(reg_str) for reg_str in payload_data.split()]
     
     def timers_read(self) -> Dict[str, int]:
-        """Reads simultaneously all the real-time timer values in the hardware board."""
+        """Reads simultaneously all the real-time timer values in the DAQ.
+
+        The timers measure the collection time of the spectrum (histogram).
+        Three timers are available: A, B, and C. Each timer can be configured
+        to count real time or live time. They can be disabled or enabled individually.
+        Notice that **Timer C** controls the collection time and must be always enabled.
+
+        Preset time is the duration of the spectrum collection window.
+        It is tied to the **Timer C** value, which can be configured as a
+        real-time or live-time timer.
+        
+        Returns:
+            Dict[str, int]: Dictionary containing the timer values.
+        """
         response = self._send_ascii_cmd(DaqCliCommands.READ_TIMERS, "-1")
         payload = response.replace(f"!{DaqCliCommands.READ_TIMERS.value}", "").strip().split()
         values = [int(v) for v in payload]
@@ -228,7 +353,15 @@ class DaqCommands:
         }
 
     def read_oscilloscope(self) -> Tuple[List[int], List[int]]:
-        """Reads the waveform data from the hardware board inside an active transaction window."""
+        """Reads the waveforms datafrom the DAQ inside an active transaction window.
+        Delivers both channels (CH1, CH2) data simultaneously as a signed integer each.
+
+        Returns:
+            Tuple[List[int], List[int]]: Tuple containing the waveform data for both channels
+        
+        Raises:
+            DaqException: If the scope capture fails
+        """
         packet = f"${DaqCliCommands.LOAD_SCOPE.value}\r"
         
         with self._connection_transaction() as active_bus:
@@ -252,7 +385,18 @@ class DaqCommands:
         return ch1_trace, ch2_trace
 
     def read_spectrum(self, base_address: int = 0) -> List[int]:
-        """Reads the spectrum data from the hardware board inside an active transaction window."""
+        """Reads the spectrum data from the DAQ/MCA.
+        
+        Args:
+            base_address (int, optional): Base address to start reading from. Defaults to 0.
+                The current firmware version only supports this segment, anyways.
+        
+        Returns:
+            List[int]: List of 32-bit unsigned integer values as the uncalibrated the spectrum
+
+        Raises:
+            DaqException: If the spectrum read operation fails
+        """
         packet = f"${DaqCliCommands.READ_SPECTRUM.value} {base_address}\r"
         
         with self._connection_transaction() as active_bus:
@@ -269,7 +413,7 @@ class DaqCommands:
         return list(struct.unpack(f"<{self.MCA_BINS}I", raw_binary))
     
 if __name__ == '__main__':
-    daq = DaqHw()
-    port_name = daq.find_port(daq.DEFAULT_VID, daq.DEFAULT_PID)
-    daq.open_port(port_name, daq.DEFAULT_BAUDRATE)
-
+    daq_api = DaqCommands()
+    daq_api.open()
+    logging.info(f"Running API test. DAQ firmware version: {daq_api.get_version()}")
+    daq_api.close()
