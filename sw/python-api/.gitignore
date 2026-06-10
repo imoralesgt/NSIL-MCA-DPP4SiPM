@@ -219,5 +219,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Compiled modules
+# Python compiled modules
 *.pyc
