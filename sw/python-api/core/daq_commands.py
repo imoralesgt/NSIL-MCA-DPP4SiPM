@@ -1,17 +1,27 @@
 """
 Module: daq_commands.py
-Description: Main high-level abstraction API layer for executing MCA operations
-             equipped with micro-level low-level hardware serial bus proxies.
+Description: High-level abstraction API layer for controlling and acquiring
+             data from the IAEA/NSIL DPP4SiPM DAQ/MCA board.
+
+Revisions:
+    1.0.0 - Initial release (2026-06-01) - I. Morales
 """
+
+from __future__ import annotations
+
+__all__ = ["DaqCommands", "DaqException", "DaqUnknownCommandException", "DaqInvalidParameterException"]
+__version__ = "1.0.0"
+__author__ = "I. Morales"
+__date__ = "2026-06-10"
 
 from core.daq_hw import DaqHw
 from core.dpp_parameters import DppParameters
 from core.daq_constants import DaqCliCommands, DppSubmodules
 from enum import Enum
 import struct, logging
-from typing import List, Tuple, Dict, Any
 from contextlib import contextmanager
-import time
+import time, sys, traceback
+from typing import List, Tuple, Dict, Any
 
 # Dedicated global logger for high-level operations and serial transactions
 logger = logging.getLogger("DAQ_MCA_API")
@@ -20,6 +30,17 @@ logging.basicConfig(filename='daq_mca.log',
                     level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(name)s: %(message)s',
                     force=True)
+
+# Recording unhandled exceptions in log file
+def log_except_hook(exctype, value, tb):
+    text = "".join(traceback.format_exception(exctype, value, tb))
+    logger.error(f"Unhandled exception:\n{text}")
+
+    # Keep showning the original exception in the console
+    sys.__excepthook__(exctype, value, tb)
+
+sys.excepthook = log_except_hook
+
 
 class DaqException(Exception):
     """Base exception for all DAQ CLI execution and communication errors."""
@@ -106,15 +127,15 @@ class DaqCommands:
 
         return port_name
 
-    def open(self, boot_delay: float = 0.5, timeout: float = 0.2):
-        """Establishes a long-lived persistent connection session to the target hardware.
+    def open(self, boot_delay: float = 0.5, timeout: float = 0.8):
+        """Establishes a long-lived persistent connection session to the target DAQ/MCA hardware board.
         
         Args:
-            boot_delay (float): Number of seconds to wait for the hardware to boot up.
-            timeout (float): Number of seconds to wait for a response from the hardware.
+            boot_delay (float): Number of seconds to wait for the DAQ to boot up.
+            timeout (float): Number of seconds to wait for a response from the DAQ.
         """
         if not self.daq.is_open:
-            logger.info(f"[SESSION]: Opening persistent channel -> {self.port_name}")
+            logger.info(f"[SESSION]: Opening persistent serial port channel -> {self.port_name}")
             self.daq.open_port(self.port_name, self.baudrate)
             self.daq.timeout = timeout
             
@@ -176,14 +197,14 @@ class DaqCommands:
             logger.info("[TX RAW BUS]: Sending packet -> %r", packet_str)
             active_bus.write(packet_str.encode('ascii'))
 
-            logger.info(f"[RX RAW BUS]: Awaiting data from hardware (timeout= {self.daq.timeout} s)...")
+            logger.info(f"[RX RAW BUS]: Awaiting reply from DAQ/MCA board (timeout= {self.daq.timeout} s)...")
             response_bytes = active_bus.read_until(b'\n\r')
 
             response = response_bytes.decode('ascii').strip()
             logger.debug("[SERIAL BUS <- RX RAW LINE]: %r", response_bytes)
 
         if not response:
-            raise DaqException(f"Communication Timeout: No response received from hardware for command '{cmd_code}'.")
+            raise DaqException(f"Communication Timeout: No response received from DAQ/MCA board for command '{cmd_code}'.")
 
         if "!ERROR:" in response:
             error_code = response.split(":")[-1].strip()
@@ -208,6 +229,7 @@ class DaqCommands:
         Returns:
             str: The firmware version string
         """
+        logging.info("Retrieving DAQ firmware version.")
         response = self._send_ascii_cmd(DaqCliCommands.GET_VERSION)
         return response.replace(f"!{DaqCliCommands.GET_VERSION.value}", "").strip()
 
@@ -217,6 +239,7 @@ class DaqCommands:
         Returns:
             str: The serial number of the MCA board
         """
+        logging.info("Retrieving DAQ serial number.")
         response = self._send_ascii_cmd(DaqCliCommands.GET_SERIAL)
         return response.replace(f"!{DaqCliCommands.GET_SERIAL.value}", "").strip()
 
@@ -235,6 +258,7 @@ class DaqCommands:
         Returns:
             bool: True if the operation was successful
         """
+        logging.info("Starting data acquisition.")
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "1")
         return response is not None
 
@@ -250,6 +274,7 @@ class DaqCommands:
         Returns:
             bool: True if the operation was successful
         """
+        logging.info("Stopping data acquisition.")
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "0")
         return response is not None
 
@@ -260,6 +285,7 @@ class DaqCommands:
         Returns:
             bool: True if the operation was successful
         """
+        logging.info("Resetting timers.")
         response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "4")
         return response is not None
 
@@ -273,6 +299,7 @@ class DaqCommands:
         Returns:
             bool: True if the spectrum clearing operation was successful
         """
+        logging.info(f"Clearing spectrum segment with base address: {segment_index}.")
         response = self._send_ascii_cmd(DaqCliCommands.CLEAR_SPECTRUM, str(segment_index))
         return f"!{DaqCliCommands.CLEAR_SPECTRUM.value}" in response
 
@@ -377,6 +404,7 @@ class DaqCommands:
         serialized_string = " ".join(str(int(reg_val)) for reg_val in register_array)
         arguments = f"{submodule.group_index} {serialized_string}"
 
+        logger.info(f"Setting DPP parameters for submodule: {submodule.name}, values: {serialized_string}")
         response = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments)
         return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
 
@@ -392,6 +420,7 @@ class DaqCommands:
         Returns:
             List[int]: List of 32-bit unsigned integer values
         """
+        logger.info(f"Retrieving DPP parameters for submodule: {submodule.name}")
         response = self._send_ascii_cmd(DaqCliCommands.GET_DPP_PARAMS, str(submodule.group_index))
         payload_data = response.replace(f"!{DaqCliCommands.GET_DPP_PARAMS.value}", "").strip()
         return [int(reg_str) for reg_str in payload_data.split()]
@@ -411,6 +440,7 @@ class DaqCommands:
         Returns:
             Dict[str, int]: Dictionary containing the timer values.
         """
+        logging.info("Reading timer values from DAQ.")
         response = self._send_ascii_cmd(DaqCliCommands.READ_TIMERS, "-1")
         payload = response.replace(f"!{DaqCliCommands.READ_TIMERS.value}", "").strip().split()
         values = [int(v) for v in payload]
@@ -436,6 +466,7 @@ class DaqCommands:
         """
         packet = f"${DaqCliCommands.LOAD_SCOPE.value}\r"
         
+        logger.info("Retrieveing oscilloscope trace capture.")
         with self._connection_transaction() as active_bus:
             logger.info("[TX RAW BUS]: Sending scope request -> %r", packet)
             active_bus.write(packet.encode('ascii'))
@@ -471,6 +502,7 @@ class DaqCommands:
         """
         packet = f"${DaqCliCommands.READ_SPECTRUM.value} {base_address}\r"
         
+        logger.info("Retrieveing spectrum from DAQ.")
         with self._connection_transaction() as active_bus:
             logger.info("[TX RAW BUS]: Sending spectrum request -> %r", packet)
             active_bus.write(packet.encode('ascii'))
@@ -481,6 +513,9 @@ class DaqCommands:
 
             raw_binary = active_bus.read(self.MCA_BINS * self.BYTES_IN_WORD)
             active_bus.read_until(b'\n\r')  # Flush final bounding indicators
+
+            logger.debug("[RX RAW BUS]: Received spectrum data -> %r", raw_binary)
+            logger.debug(f"[RX RAW BUS]: Data length: {len(raw_binary)} bytes")
 
         return list(struct.unpack(f"<{self.MCA_BINS}I", raw_binary))
     
