@@ -6,9 +6,15 @@ Description: Hardware-in-the-Loop (HIL) integration test suite running
              parameter streaming and exports a plot of the captured spectrum
              and oscilloscope traces.
 Notes: 
-    - To execute this test suite, the DAQ/MCA board must be connected to the host.
+    - To execute this test suite, the DAQ/MCA board must be connected to the host computer.
     - To run (from the python-api root): `uv run python -m pytest tests/test_hil_daq.py -v -s --log-cli-level=INFO`
 """
+
+from __future__ import annotations
+
+__version__ = "1.0.0"
+__author__ = "I. Morales"
+__date__ = "2026-06-10"
 
 import pytest, time, logging, os
 import matplotlib.pyplot as plt  # Import for automated spectrum visualization

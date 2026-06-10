@@ -5,6 +5,13 @@ Description: PyTest shared fixtures for Hardware-in-the-Loop (HIL) validation.
              Automatically discovers physical connected DAQ/MCA devices.
 """
 
+from __future__ import annotations
+
+__all__ = ["DaqHw"]
+__version__ = "1.0.0"
+__author__ = "I. Morales"
+__date__ = "2026-06-10"
+
 import pytest
 from core.daq_hw import DaqHw
 

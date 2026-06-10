@@ -6,6 +6,10 @@ through a persistent serial connection.
 This API uses `uv` as the default package manager. Check the `pyproject.toml` file
 for more details on the requirements.
 
+Usage:
+    Check the `main()` function at the end of this document for an example of
+    how to use the API.
+
 Available methods in the API:
     For most of the applications, the following methods can be used to control and 
     acquire the data from the MCA board:
@@ -88,7 +92,6 @@ Revisions:
 """
 
 from __future__ import annotations
-__all__ = ["DaqCommands", "DaqException", "DaqUnknownCommandException", "DaqInvalidParameterException"]
 __version__ = "1.0.0"
 __author__ = "I. Morales"
 __date__ = "2026-06-10"

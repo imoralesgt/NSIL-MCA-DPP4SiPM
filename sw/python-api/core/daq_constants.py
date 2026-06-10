@@ -5,6 +5,13 @@ Description: Immutable enumerations and definitions for the DAQ/MCA API.
              Deprecated modules 3.7 and 3.11 have been completely removed.
 """
 
+from __future__ import annotations
+
+__all__ = ["DaqCliCommands", "DppSubmodules"]
+__version__ = "1.0.0"
+__author__ = "I. Morales"
+__date__ = "2026-06-10"
+
 from enum import Enum
 
 class DaqCliCommands(Enum):

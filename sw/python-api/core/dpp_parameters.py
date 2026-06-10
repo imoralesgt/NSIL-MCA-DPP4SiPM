@@ -1,4 +1,14 @@
 """
+Module: dpp_parameters.py
+Description: Used to convert the human-readable DPP parameter values into 
+             unsinged 32-bit fixed point values sent to the DAQ/MCA board.
+
+Revisions:
+    1.0.0 - Initial release (2025-10-03) - I. Morales, M. Bogovac
+    1.0.1 - Added PuR parameters (2026-05-25) - I. Morales
+    1.0.2 - Fixed computation bugs in BLR slow (2026-06-09) - I. Morales
+             
+
 Instructions:
     - Scroll down to the end of this file
     - Inspect how the library is used in the `if __name__ == "__main__":` block
@@ -7,10 +17,12 @@ Instructions:
     - Requirements: fixedpoint, numpy
 """
 
+from __future__ import annotations
+
 __authors__ = "Ivan Morales, Mladen Bogovac"
 __license__ = "MIT"
-__version__ = "1.1"
-__date__ = "2026-05-25"
+__version__ = "1.0.2"
+__date__ = "2026-06-09"
 
 from fixedpoint import FixedPoint
 import numpy as np
