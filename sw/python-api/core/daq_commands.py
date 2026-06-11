@@ -260,8 +260,13 @@ class DaqCommands:
         response = self._send_ascii_cmd(DaqCliCommands.GET_VERSION)
         return response.replace(f"!{DaqCliCommands.GET_VERSION.value}", "").strip()
 
-    def _get_serial_old(self) -> str:
-        """Retrieves the system serial number string from the hardware.
+    def get_serial_old(self) -> str:
+        """Do not use this method until the MicroBlaze firmware has been updated.
+        An alternative method has been implemented. Use `get_serial` instead.
+        
+        Retrieves the system serial number string from the hardware. It relies
+        on the hard-coded serial number in the MicroBlaze firmware of the DAQ.
+
         
         Returns:
             str: The serial number of the MCA board
