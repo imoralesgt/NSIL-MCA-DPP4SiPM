@@ -16,6 +16,7 @@ __date__ = "2026-06-10"
 from serial import Serial
 from serial.tools import list_ports
 import os
+from sys import platform
 
 class DaqHw(Serial):
     """Data Acquisition Hardware (DAQ) management class over UART.
@@ -28,12 +29,33 @@ class DaqHw(Serial):
         DEFAULT_VID (str): Default Vendor ID for the USB-UART FTDI chip.
         DEFAULT_PID (str): Default Product ID for the CMOD A7 board.
         DEFAULT_BAUDRATE (int): Default serial baud rate (115200).
+
+        OS_WINDOWS (str): Operating system identifier for Windows.
+        OS_LINUX (str): Operating system identifier for Linux.
+        OS_MAC (str): Operating system identifier for macOS.
+        OS_UNKNOWN (str): Operating system identifier for unknown systems.
     """
 
     #: Use these default values for the USB-UART FTDI chip in the CMOD A7 board
     DEFAULT_VID = "0403"
     DEFAULT_PID = "6010"
     DEFAULT_BAUDRATE = 115200
+
+    #: Internal operating system identifiers
+    OS_WINDOWS = 'windows'
+    OS_LINUX = 'linux'
+    OS_MAC = 'macos'
+    OS_UNKNOWN = 'unknown'
+
+    def __init__(self, port = None):
+        """Constructor for the `DaqHw` class. Initializes the inherited Serial class
+        and determines the current operating system.
+        
+        Args:
+            port (str): The name of the serial port to open, if available.
+        """
+        super().__init__(port)
+        self.__os = self.__set_os()
 
     def _disregard_jtag(self):
         """Finds and filters UART-only ports while ignoring JTAG channels.
@@ -67,9 +89,25 @@ class DaqHw(Serial):
         # Returns a list of UART-only ports associated to /dev/ttyUSB or /dev/ttyACM... 
         return sorted(uart_ports)
 
+    def __set_os(self):
+        """Determines the current operating system based on the `platform`.
+        Sets it to the private attribute `__os`.
+        """
+        if platform == "win32" or platform == "cygwin":
+            self.__os = self.OS_WINDOWS
+        elif platform == "linux":
+            self.__os = self.OS_LINUX
+        elif platform == "darwin":
+            self.__os = self.MAC
+        else:
+            self.__os = self.OS_UNKNOWN
 
-    def find_port(self, vid : int, pid : int) -> str:
-        """Finds the target device's serial port based on its VID and PID.
+    def get_os(self):
+        """Returns the current operating system."""
+        return self.__os
+
+    def find_port(self, vid : int, pid : int) -> list[str] | None:
+        """Finds the target device's serial port name based on its VID and PID.
 
         If you are uncertain about the specific values, use the `DEFAULT_VID` 
         and `DEFAULT_PID` class attributes.
@@ -81,9 +119,9 @@ class DaqHw(Serial):
                 integer or a hexadecimal string).
 
         Returns:
-            str | list | None: A string containing the port name if a single 
-            device is found, a list of strings if multiple devices match, 
-            or None if no valid hardware is found.
+            list | None: A list of lists containing the port name of the devices found.
+            A single-element list is returned if only one device is found.
+            None is returned if nothig is found.
         """
         
         # Convert to integers in case hexadecimal text is passed as parameter
@@ -103,16 +141,40 @@ class DaqHw(Serial):
             if port.vid == target_vid and port.pid == target_pid:
                 device_name = port.device
                 
-                #Only if UART (serial port) instance, disregard JTAG
+                #Only if matches a UART (serial port) instance, disregard JTAG
                 if device_name in valid_uart_ports: 
                     devices.append(device_name)
 
-        if len(devices) == 1:
-            return devices[0]
-        elif len(devices) > 1:
+        if len(devices):
             return devices               
 
         return None
+    
+    def retrieve_serial(self, port_name : str) -> str | None:
+        """Retrieves the serial number of a specific serial port name listed in the system.
+
+        Args:
+            port_name (str): The name of the specific port name to look for its serial number for.
+
+        Returns:
+            str | None: The serial number of the specified device name. None if no matches are found.
+        """
+
+        # All the COM ports
+        ports = list_ports.comports()
+
+        # Look for the serial number of the specified `port_name`
+        for port in ports:
+            if port.device in port_name:
+                port_serial = str(port.serial_number).upper()
+                #: Matching the convetion of the JTAG/UART names. JTAG S/N ends with 'A', UART S/N ends with 'B'.
+                if port_serial.endswith('A'):
+                    port_serial = str(f"{port_serial[:-1]}B")
+                
+                return str(port_serial)
+
+        return None
+
     
     def open_port(self, port_name : str, baudrate : int) -> Serial:
         """Opens a specific serial port.
@@ -152,8 +214,10 @@ if __name__ == "__main__":
     port_name = daq.find_port(daq.DEFAULT_VID, daq.DEFAULT_PID)
     print(f"DAQ found in port: {port_name}")
 
-    ## Checking if the port can be opened and closed
+    ## Checking if the port can be opened, the S/N retrieved and finally be closed
     daq.open_port(port_name, 115200)
     print(f"Port opened: {daq.is_open}")
+    daq.get_serial(daq.DEFAULT_VID, daq.DEFAULT_PID)
+    print(f"Serial number: {daq.get_serial(daq.DEFAULT_VID, daq.DEFAULT_PID)}")
     daq.close_port(daq)
     print(f"Port closed: {not daq.is_open}")

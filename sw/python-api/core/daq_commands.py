@@ -74,14 +74,19 @@ class DaqCommands:
                  sampling_rate: float = 50e6, tau_d: float = 1.145e-6, tau_r: float = 0.220e-6, 
                  **dpp_kwargs):
         """Prepares session state elements and encapsulates the DPP parameter library."""
-        self.daq = DaqHw(port=None) 
+        self.daq = DaqHw() 
+
         if port_name is None:
             logger.info("No serial port name provided, attempting to auto-discover...")
             port_name = self._find_port()
-            logger.info(f"Discovered DAQ hardware at port {port_name}")
+            logger.info(f"Discovered DAQ board at port {port_name}")
         
         self.port_name = port_name
         self.baudrate = baudrate
+        serial_number = self.daq.retrieve_serial(port_name)
+        self.__set_sn(serial_number)
+
+        logger.info(f"DAQ board serial number: {serial_number}")
         
         logger.info("Initializing underlying Dpp_Parameters submodules...")
         logger.debug("[DEBUG START]: Passing arguments to Dpp_Parameters constructor...")
@@ -116,16 +121,18 @@ class DaqCommands:
             DaqException: If no DAQ hardware is found
 
         """
-        port_name = self.daq.find_port(self.daq.DEFAULT_VID, self.daq.DEFAULT_PID)
+        port_name_list = self.daq.find_port(self.daq.DEFAULT_VID, self.daq.DEFAULT_PID)
 
-        if not port_name:
+        if not port_name_list:
             raise DaqException(f"No DAQ hardware found matching VID {self.daq.DEFAULT_VID} and PID {self.daq.DEFAULT_PID}.")
 
-        if isinstance(port_name, list):
-            # Fallback to the first available hardware link if multiple are found
-            port_name = port_name[0]
+        # Falling back to the first available hardware device if multiple are found
+        if isinstance(port_name_list, list):
+            port_name = port_name_list[0]
 
-        return port_name
+            return port_name
+        
+        return None
 
     def open(self, boot_delay: float = 0.5, timeout: float = 0.8):
         """Establishes a long-lived persistent connection session to the target DAQ/MCA hardware board.
@@ -158,6 +165,26 @@ class DaqCommands:
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Automatically closes lines when exiting runtime workspace scopes."""
         self.close()
+
+    def __set_sn(self, serial_number: str):
+        """Sets the serial number of the device based on the scanned s/n from the USB VID/PID.
+        This method overrides the serial number setting/getting originally present in the 
+        documentation.
+
+        Args:
+            serial_number (str): The serial number of the device
+        """
+        self.__serial_number = serial_number
+
+    def __get_serial(self) -> str:
+        """Retrieves the serial number of the connected device. This method must be called
+        only after the device name and serial number has been obtained with `find_port()`
+        or `get_serial()` methods from the `DaqHw`class.
+
+        Returns:
+            str: The serial number of the device
+        """
+        return self.__serial_number
 
     @contextmanager
     def _connection_transaction(self):
@@ -233,7 +260,7 @@ class DaqCommands:
         response = self._send_ascii_cmd(DaqCliCommands.GET_VERSION)
         return response.replace(f"!{DaqCliCommands.GET_VERSION.value}", "").strip()
 
-    def get_serial(self) -> str:
+    def _get_serial_old(self) -> str:
         """Retrieves the system serial number string from the hardware.
         
         Returns:
@@ -242,6 +269,17 @@ class DaqCommands:
         logging.info("Retrieving DAQ serial number.")
         response = self._send_ascii_cmd(DaqCliCommands.GET_SERIAL)
         return response.replace(f"!{DaqCliCommands.GET_SERIAL.value}", "").strip()
+    
+    def get_serial(self) -> str:
+        """Returns the serial number retrieved from the onboard FTDI UART chip in the
+        constructor. This method overrides the `_get_serial_old` method, which relied
+        on a hard-coded serial number in the MicroBlaze firmware of the DAQ.
+
+        Returns:
+            str: The serial number of the MCA board
+        """
+        logging.info("Retrieving the DAQ serial number from the onboard FTDI UART chip.")
+        return self.__get_serial()
 
     def data_acquisition_start(self) -> bool:
         """Starts the spectrum acquisition in the DAQ. This method should be
