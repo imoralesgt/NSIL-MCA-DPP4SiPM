@@ -98,6 +98,7 @@ __date__ = "2026-06-10"
 
 from core.daq_commands import DaqCommands # DAQ/MCA API library
 from time import sleep # Specturm collection delay (native Python module)
+from datetime import datetime # Used to record the timestamp in the SPE spectrum file
 from tqdm import trange # Spectrum collection progress bar
 import matplotlib.pyplot as plt  # Spectrum plot visualization
 
@@ -141,6 +142,52 @@ def get_spectrum(daq_instance : DaqCommands) -> list:
 
     return spectrum
 
+def create_spe_file(file_path: str, spectrum: list, live_time: float, real_time: float) -> None:
+    """
+    Generates a standard ORTEC .Spe spectrum file.
+    
+    Args:
+        file_path (str): Destination path for the output .Spe file.
+        spectrum (list): List of integers representing counts per ADC channel.
+        live_time (float): Live time of the measurement in seconds.
+        real_time (float): Real time time of the measurement in seconds.
+    """
+    
+    # Get the channel range (0 to N-1)
+    first_channel = 0
+    last_channel = len(spectrum) - 1
+    
+    with open(file_path, "w", encoding="ascii") as f:
+        # File identification header
+        f.write("$SPEC_ID:\n")
+        f.write("Example spectrum from DPP4SiPM DAQ/MCA API\n")
+        
+        # Measurement date and time (Required format: MM/DD/YYYY HH:MM:SS)
+
+        # Format date to standard SPE format: MM/DD/YYYY HH:MM:SS
+        date_str = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        f.write("$DATE_MEA:\n")
+        f.write(f"{date_str}\n")
+        
+        # Live time and Real time in seconds
+        f.write("$MEAS_TIM:\n")
+        f.write(f"{live_time:.2f} {real_time:.2f}\n")
+        
+        # Data channel bounds
+        f.write("$DATA:\n")
+        f.write(f"{first_channel} {last_channel}\n")
+        
+        # Counts per channel (one integer per line)
+        for counts in spectrum:
+            f.write(f"{int(counts)}\n")
+
+        # Deafult calibration parameters
+        f.write("$MCA_CAL:\n3\n0.000 1.000 0.000\n")
+
+        # End of file marker
+        f.write("$ENDRECORD:\n")
+
+
 def plot_spectrum(spectrum : list) -> None:
     """Plots the energy spectrum data collected with the MCA/DAQ board.    
     """
@@ -162,15 +209,14 @@ def main():
     daq_api = DaqCommands(
         tau_d = 1.21e-6, # Decay time of the detector signal pulse shape
         tau_r = 0.206e-6, # Rise time of the detector signal pulse shape
-        timers_preset = 60_000, # Spectrum collection time in MILLISECONDS. Based on Timer C (live time)
+        timers_preset = 120_000, # Spectrum collection time in MILLISECONDS. Based on Timer C (live time)
         timers_a_live_time = False, # Live time for timer A
         timers_c_live_time = True, # Live time for timer C
         shaper_s_tau_pk = 2.5e-6, # Peaking time of the slow pulse shaper
         shaper_s_tau_pk_top = 1.0e-6, # Peaking time of the top of the slow pulse shaper
-        blr_s_threshold_gain = 4.0, # Baseline restorer (slow) threshold gain (baseline noise removal)
-        vga_gain_coarse = 12, # Analog amplifier gain prior to the ADC input
-        dc_offset = -0.03, # DC offset applied after the ADC, fine-tuning dynamic range
-        smoothing_factor = 4, # Averaging filter smoothing factor. Improves SNR prior to shaper.
+        blr_s_threshold_gain = 2.95, # Baseline restorer (slow) threshold gain (baseline noise removal)
+        vga_gain_coarse = 6.4, # Analog amplifier gain prior to the ADC input
+        smoothing_factor = 2, # Averaging filter smoothing factor. Improves SNR prior to shaper.
         invert_pulse = False, # Invert the detector signal polarity
     )
     
@@ -193,6 +239,10 @@ def main():
     total_counts = sum(spectrum)
     print(f"Timers data: {timers_data}")
     print(f"Total counts: {total_counts}")
+
+    # Store the spectrum as an SPE file (timers are in milliseconds)
+    print("Creating spectrum.spe file")
+    create_spe_file("spectrum.spe", spectrum, timers_data['tmr_c']/1000.0, timers_data['tmr_a']/1000.0)
     
     # And plot the spectrum once it has been collected
     plot_spectrum(spectrum)
