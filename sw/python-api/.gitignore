@@ -221,3 +221,6 @@ __marimo__/
 
 # Python compiled modules
 *.pyc
+
+# Spectrum files
+*.spe
