@@ -1769,7 +1769,7 @@ class DppParameters:
                  pkd_f_x_max = 1.957,
                  invert_pulse : bool = False,
                  smoothing_factor : int = 1,
-                 dc_offset : float = -0.77,
+                 dc_offset : float = -0.03,
                  poles : int = 2,
                  tau_l : float = 50e-6,
                  scope_bram_size : int = 2048,
