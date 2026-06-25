@@ -160,6 +160,9 @@ class DaqHw(Serial):
             str | None: The serial number of the specified device name. None if no matches are found.
         """
 
+        # Characters in the base serial number, without channel (JTAG:A, UART:B)
+        BASE_SN_LEN = 12 
+
         # All the COM ports
         ports = list_ports.comports()
 
@@ -167,9 +170,14 @@ class DaqHw(Serial):
         for port in ports:
             if port.device in port_name:
                 port_serial = str(port.serial_number).upper()
-                #: Matching the convetion of the JTAG/UART names. JTAG S/N ends with 'A', UART S/N ends with 'B'.
-                if port_serial.endswith('A'):
-                    port_serial = str(f"{port_serial[:-1]}B")
+
+                #: Strip out leading characters out of the serial number, which may indicate
+                #: the channel of the FTDI chip (JTAG, UART, etc).
+                port_serial = port_serial[:BASE_SN_LEN]
+                
+                #: Matching the convetion of the JTAG/UART names. JTAG channel ends with 'A', UART ends with 'B'.
+                #: Thus, the 'B' is added at the end to match the UART channel S/N.
+                port_serial = f"{port_serial}B"
                 
                 return str(port_serial)
 
