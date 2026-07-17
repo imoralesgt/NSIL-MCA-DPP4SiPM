@@ -497,6 +497,246 @@ class DaqCommands:
             "ctrl_bits": values[5]
         }
 
+    # =====================================================================
+    # HIGH-LEVEL TIMERS DPP SUBMODULE API (issue #34)
+    # =====================================================================
+    #
+    # Ctrl_bits bit layout (see daq_constants.py / hardware documentation,
+    # DPP parameter group 4):
+    #   bit 0       = run mode (0=manual, 1=auto). NOT hardware-implemented -
+    #                 always forced to 0 (manual) by every method below.
+    #   bit 2/3/4   = TMR C/B/A live-time select (1=live time, 0=real time)
+    #   bit 5/6/7   = TMR C/B/A enable (1=enabled, 0=disabled)
+    #   bit 8/9/10  = TMR C/B/A clear (pulse-triggered, NOT level-held - see
+    #                 clear_timers() below)
+    # =====================================================================
+
+    def _set_bit(self, value: int, bit_index: int, bit_state: bool) -> int:
+        """Sets or clears a single bit position within an integer bitmask value.
+
+        Args:
+            value (int): The original integer value.
+            bit_index (int): Zero-indexed bit position to modify.
+            bit_state (bool): True to set the bit to 1, False to clear it to 0.
+
+        Returns:
+            int: The updated integer value with the requested bit modified.
+        """
+        if bit_state:
+            return value | (1 << bit_index)
+        return value & ~(1 << bit_index)
+
+    def get_timers_settings(self) -> Dict[str, Any]:
+        """Reads the current Timers DPP submodule configuration (group 4)
+        directly from the hardware via `$RT -1`, without requiring driver
+        reinitialization.
+
+        Decodes the Ctrl_bits register into individual per-timer live/real-time
+        and enable flags, alongside the raw Preset value (ms).
+
+        NOTE: The hardware does not implement an automatic acquisition run
+        mode. 'run_mode' is always reported as 'manual', matching the value
+        every setter in this API always writes back (see set_timers_run_mode).
+
+        Returns:
+            Dict[str, Any]: {
+                "preset_ms": int,
+                "run_mode": str,        # always "manual" - see set_timers_run_mode
+                "tmr_a_live": bool,     # True = live time, False = real time
+                "tmr_b_live": bool,
+                "tmr_c_live": bool,
+                "tmr_a_enabled": bool,
+                "tmr_b_enabled": bool,
+                "tmr_c_enabled": bool,
+            }
+        """
+        logger.info("Retrieving high-level Timers DPP submodule configuration.")
+        timers = self.timers_read()
+        ctrl_bits = timers["ctrl_bits"]
+
+        return {
+            "preset_ms": timers["preset"],
+            "run_mode": "manual",
+            "tmr_a_live": bool(ctrl_bits & (1 << 4)),
+            "tmr_b_live": bool(ctrl_bits & (1 << 3)),
+            "tmr_c_live": bool(ctrl_bits & (1 << 2)),
+            "tmr_a_enabled": bool(ctrl_bits & (1 << 7)),
+            "tmr_b_enabled": bool(ctrl_bits & (1 << 6)),
+            "tmr_c_enabled": bool(ctrl_bits & (1 << 5)),
+        }
+
+    def set_timers_preset(self, preset_ms: int) -> bool:
+        """Updates ONLY the Preset register (Timer C collection window, in ms)
+        on the Timers DPP submodule (group 4), without touching any other DPP
+        submodule and without requiring driver reinitialization.
+
+        Performs a read-modify-write: the current Ctrl_bits value is read live
+        from the hardware via `$RT -1` and preserved as-is (aside from forcing
+        the run-mode bit to manual), so any previously configured live/real-time
+        or enable flags are left untouched.
+
+        Args:
+            preset_ms (int): Desired collection time / Timer C preset, in ms.
+
+        Returns:
+            bool: True if the operation was successful
+        """
+        current = self.timers_read()
+        ctrl_bits = self._set_bit(current["ctrl_bits"], 0, False)  # force manual mode
+
+        logger.info(f"Setting Timers preset to {preset_ms} ms (ctrl_bits preserved: {ctrl_bits}).")
+        arguments = f"{DppSubmodules.TIMERS.group_index} {preset_ms} {ctrl_bits}"
+        response = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments)
+        return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
+
+    def set_timers_mode(self, tmr_a_live: bool = None, tmr_b_live: bool = None, tmr_c_live: bool = None) -> bool:
+        """Updates ONLY the live-time/real-time selection bits for the requested
+        timers on the Timers DPP submodule (group 4), without touching Preset,
+        the enable bits, or any other DPP submodule.
+
+        Performs a read-modify-write against the hardware (`$RT -1`): any
+        argument left as None keeps that timer's current live/real-time
+        setting unchanged.
+
+        Args:
+            tmr_a_live (bool, optional): True = live time, False = real time.
+                None (default) leaves Timer A's current setting unchanged.
+            tmr_b_live (bool, optional): Same semantics, for Timer B.
+            tmr_c_live (bool, optional): Same semantics, for Timer C.
+
+        Returns:
+            bool: True if the operation was successful
+        """
+        current = self.timers_read()
+        ctrl_bits = current["ctrl_bits"]
+
+        if tmr_c_live is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 2, tmr_c_live)
+        if tmr_b_live is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 3, tmr_b_live)
+        if tmr_a_live is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 4, tmr_a_live)
+
+        ctrl_bits = self._set_bit(ctrl_bits, 0, False)  # force manual mode
+
+        logger.info(f"Setting Timers mode -> tmr_a_live={tmr_a_live}, tmr_b_live={tmr_b_live}, tmr_c_live={tmr_c_live} (ctrl_bits={ctrl_bits}).")
+        arguments = f"{DppSubmodules.TIMERS.group_index} {current['preset']} {ctrl_bits}"
+        response = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments)
+        return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
+
+    def set_timers_enable(self, tmr_a: bool = None, tmr_b: bool = None, tmr_c: bool = None) -> bool:
+        """Enables or disables the requested timers on the Timers DPP submodule
+        (group 4), without touching Preset, the live/real-time bits, or any
+        other DPP submodule.
+
+        Performs a read-modify-write against the hardware (`$RT -1`): any
+        argument left as None keeps that timer's current enable state
+        unchanged.
+
+        Note: Timer C must remain enabled for spectrum collection to function
+        (the hardware documentation states it "must always be enabled"). This
+        method does not enforce that constraint - the caller is responsible
+        for it.
+
+        Args:
+            tmr_a (bool, optional): True = enabled, False = disabled.
+                None (default) leaves Timer A's current state unchanged.
+            tmr_b (bool, optional): Same semantics, for Timer B.
+            tmr_c (bool, optional): Same semantics, for Timer C.
+
+        Returns:
+            bool: True if the operation was successful
+        """
+        current = self.timers_read()
+        ctrl_bits = current["ctrl_bits"]
+
+        if tmr_c is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 5, tmr_c)
+        if tmr_b is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 6, tmr_b)
+        if tmr_a is not None:
+            ctrl_bits = self._set_bit(ctrl_bits, 7, tmr_a)
+
+        ctrl_bits = self._set_bit(ctrl_bits, 0, False)  # force manual mode
+
+        logger.info(f"Setting Timers enable -> tmr_a={tmr_a}, tmr_b={tmr_b}, tmr_c={tmr_c} (ctrl_bits={ctrl_bits}).")
+        arguments = f"{DppSubmodules.TIMERS.group_index} {current['preset']} {ctrl_bits}"
+        response = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments)
+        return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
+
+    def clear_timers(self, tmr_a: bool = False, tmr_b: bool = False, tmr_c: bool = False) -> bool:
+        """Issues a one-shot clear pulse to the requested timer counters on the
+        Timers DPP submodule (group 4), resetting them to 0 without touching
+        Preset, the live/real-time bits, the enable bits, or any other DPP
+        submodule.
+
+        The clear bits are pulse-triggered (not level-held): this method
+        performs two back-to-back writes internally - first setting the
+        requested clear bit(s) to 1, then immediately writing them back to 0 -
+        so the caller only needs to invoke this once per clear operation. No
+        delay is required between the two writes: UART transmission time is
+        far slower than the hardware's internal processing time, so the
+        second write is guaranteed to land after the pulse has registered.
+
+        Args:
+            tmr_a (bool): Pulse-clear Timer A. Default False (leave untouched).
+            tmr_b (bool): Pulse-clear Timer B. Default False (leave untouched).
+            tmr_c (bool): Pulse-clear Timer C. Default False (leave untouched).
+
+        Returns:
+            bool: True if BOTH writes (pulse-high and pulse-low) succeeded.
+        """
+        current = self.timers_read()
+        preset = current["preset"]
+        base_ctrl_bits = self._set_bit(current["ctrl_bits"], 0, False)  # force manual mode
+
+        # First write: pulse the requested clear bit(s) high
+        pulse_high = base_ctrl_bits
+        if tmr_c: pulse_high = self._set_bit(pulse_high, 8, True)
+        if tmr_b: pulse_high = self._set_bit(pulse_high, 9, True)
+        if tmr_a: pulse_high = self._set_bit(pulse_high, 10, True)
+
+        logger.info(f"Pulsing Timers clear -> tmr_a={tmr_a}, tmr_b={tmr_b}, tmr_c={tmr_c} (ctrl_bits={pulse_high}).")
+        arguments_high = f"{DppSubmodules.TIMERS.group_index} {preset} {pulse_high}"
+        response_high = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments_high)
+        success_high = f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response_high
+
+        # Second write: immediately release the clear bit(s) back to 0
+        arguments_low = f"{DppSubmodules.TIMERS.group_index} {preset} {base_ctrl_bits}"
+        response_low = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments_low)
+        success_low = f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response_low
+
+        return success_high and success_low
+
+    def set_timers_run_mode(self, manual: bool = True) -> bool:
+        """PLACEHOLDER - not backed by hardware in the current firmware revision.
+
+        The DPP4SiPM firmware does not implement an automatic acquisition run
+        mode; this driver always operates the Timers submodule in manual mode
+        (Ctrl_bits bit 0 = 0), regardless of what is requested here. This
+        method exists so application code has a stable entry point to call
+        once a future hardware revision implements auto mode, without needing
+        further API changes.
+
+        Args:
+            manual (bool): Intended run mode. True = manual (the only mode
+                currently supported). False (auto) is accepted but ignored,
+                and logs a warning.
+
+        Returns:
+            bool: True if the (manual-mode-only) write succeeded.
+        """
+        if not manual:
+            logger.warning("Automatic acquisition run mode was requested but is not implemented in the current firmware. Falling back to manual mode.")
+
+        current = self.timers_read()
+        ctrl_bits = self._set_bit(current["ctrl_bits"], 0, False)  # always manual
+
+        logger.info("Setting Timers run mode -> manual (auto mode not hardware-supported).")
+        arguments = f"{DppSubmodules.TIMERS.group_index} {current['preset']} {ctrl_bits}"
+        response = self._send_ascii_cmd(DaqCliCommands.SET_DPP_PARAMS, arguments)
+        return f"!{DaqCliCommands.SET_DPP_PARAMS.value}" in response
+
     def read_oscilloscope(self) -> Tuple[List[int], List[int]]:
         """Reads the waveforms datafrom the DAQ inside an active transaction window.
         Delivers both channels (CH1, CH2) data simultaneously as a signed integer each.
