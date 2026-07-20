@@ -306,19 +306,29 @@ class DaqCommands:
         return response is not None
 
     def data_acquisition_stop(self) -> bool:
-        """Stops the spectrum acquisition in the DAQ. Spectrum
-        data is cleared in the process. For a precise stop, configure
-        the timers to the desired live or real time collection time.
+        """Stops the spectrum acquisition in the DAQ manually, without clearing
+        the accumulated spectrum or the timer counters.
 
-        Use this method only if the whole system is meant to be stopped, 
-        such as when shutting down the system (not required) or fine-tuning
-        power saving features. Do not use this method otherwise.
-        
+        FIXED: this previously sent flag "0", which per the $AQ command
+        documentation actually means "Starts automatic acquisition. Cleans BRAM
+        contents prior to starting." - i.e. a START-with-clear command, not a
+        stop. Calling it after a genuine acquisition would silently wipe the
+        just-collected spectrum and reset the timers, then immediately begin a
+        NEW automatic acquisition cycle - explaining symptoms like a spectrum
+        read back as all zeros, or live/real time stuck at a tiny fixed value
+        regardless of the requested collection duration (whatever few hundred
+        milliseconds elapsed between this call and the next read). Flag "2" is
+        the documented manual stop with no clearing side effect.
+
+        This is safe to call routinely as a normal stop operation (e.g. at the
+        end of a survey/background/batch run) - it does not need to be reserved
+        for whole-system shutdown.
+
         Returns:
             bool: True if the operation was successful
         """
         logging.info("Stopping data acquisition.")
-        response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "0")
+        response = self._send_ascii_cmd(DaqCliCommands.DATA_ACQUISITION, "2")
         return response is not None
 
     def timers_reset(self) -> bool:
@@ -500,6 +510,14 @@ class DaqCommands:
     # =====================================================================
     # HIGH-LEVEL TIMERS DPP SUBMODULE API (issue #34)
     # =====================================================================
+    # The methods below let application code query/update the Timers DPP
+    # submodule (group 4: Preset + Ctrl_bits) WITHOUT requiring a full driver
+    # reinitialization via the DppParameters/Dpp_Timers object layer. That
+    # layer is reserved for one-time full-board programming (dpp_initialize);
+    # these methods talk `$SP 4` / `$RT -1` directly instead, the same way
+    # timers_read() and data_acquisition_start/stop already do, so application
+    # code never needs to import or construct DppParameters/Dpp_Timers just to
+    # change the collection duration or timer mode.
     #
     # Ctrl_bits bit layout (see daq_constants.py / hardware documentation,
     # DPP parameter group 4):
@@ -711,7 +729,7 @@ class DaqCommands:
     def set_timers_run_mode(self, manual: bool = True) -> bool:
         """PLACEHOLDER - not backed by hardware in the current firmware revision.
 
-        The DPP4SiPM firmware does not implement an automatic acquisition run
+        The DPP4SiPM board does not implement an automatic acquisition run
         mode; this driver always operates the Timers submodule in manual mode
         (Ctrl_bits bit 0 = 0), regardless of what is requested here. This
         method exists so application code has a stable entry point to call
