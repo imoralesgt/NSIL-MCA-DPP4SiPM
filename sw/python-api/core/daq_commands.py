@@ -134,6 +134,29 @@ class DaqCommands:
         
         return None
 
+    @staticmethod
+    def is_device_present() -> bool:
+        """Lightweight autodiscovery presence check (issue #70): queries the
+        DAQ board's known USB VID/PID the same way _find_port() does, but
+        without constructing a full DaqCommands instance or opening a serial
+        connection - suitable for cheap, frequent polling (e.g. a 1-second
+        heartbeat loop) to detect a physical disconnect. Replaces the old
+        approach of checking os.path.exists() on a specific port path
+        remembered from a prior connection - detectors.json no longer stores
+        a port name at all, so there's nothing to remember; autodiscovery is
+        queried fresh every time.
+
+        Returns:
+            bool: True if at least one matching device is currently connected.
+        """
+        try:
+            probe = DaqHw()
+            port_list = probe.find_port(probe.DEFAULT_VID, probe.DEFAULT_PID)
+            return bool(port_list)
+        except Exception as e:
+            logger.debug(f"Autodiscovery liveness check found no device: {e}")
+            return False
+
     def open(self, boot_delay: float = 0.5, timeout: float = 0.8):
         """Establishes a long-lived persistent connection session to the target DAQ/MCA hardware board.
         
