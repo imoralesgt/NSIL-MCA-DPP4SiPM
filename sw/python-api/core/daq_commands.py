@@ -46,8 +46,7 @@ def _resolve_log_level(default: int = logging.INFO) -> int:
     level_name = os.environ.get("DAQ_MCA_LOG_LEVEL")
     if not level_name:
         return default
-    level = logging.getLevelName(level_name.upper())
-    return level if isinstance(level, int) else default
+    return logging.getLevelNamesMapping().get(level_name.upper(), default)
 
 os.makedirs(LOG_DIR, exist_ok=True)
 
