@@ -224,3 +224,6 @@ __marimo__/
 
 # Spectrum files
 *.spe
+
+# Rotated/compressed log files
+/logs/

@@ -18,17 +18,51 @@ from core.daq_hw import DaqHw
 from core.dpp_parameters import DppParameters
 from core.daq_constants import DaqCliCommands, DppSubmodules
 from enum import Enum
-import struct, logging
+import struct, logging, os, gzip, shutil
+from logging.handlers import RotatingFileHandler
 from contextlib import contextmanager
 import time, sys, traceback
 from typing import List, Tuple, Dict, Any
 
 # Dedicated global logger for high-level operations and serial transactions
 logger = logging.getLogger("DAQ_MCA_API")
-logging.basicConfig(filename='daq_mca.log',
-                    encoding='utf-8',
-                    level=logging.INFO,
+
+LOG_DIR = "logs"
+LOG_FILE = os.path.join(LOG_DIR, "daq_mca.log")
+LOG_MAX_BYTES = 10 * 1024 * 1024  # split into a new file every 10 MB
+LOG_BACKUP_COUNT = 100  # circular rotation: oldest rotated file is discarded past this count (1 GB of compressed logs max)
+
+def _gzip_rotator(source: str, dest: str) -> None:
+    """Compress a just-rotated log file with gzip and drop the plaintext copy."""
+    with open(source, "rb") as f_in, gzip.open(dest, "wb") as f_out:
+        shutil.copyfileobj(f_in, f_out)
+    os.remove(source)
+
+def _gzip_namer(name: str) -> str:
+    return f"{name}.gz"
+
+def _resolve_log_level(default: int = logging.INFO) -> int:
+    """Log level is configurable via the DAQ_MCA_LOG_LEVEL env var (e.g. DEBUG, INFO, WARNING)."""
+    level_name = os.environ.get("DAQ_MCA_LOG_LEVEL")
+    if not level_name:
+        return default
+    level = logging.getLevelName(level_name.upper())
+    return level if isinstance(level, int) else default
+
+os.makedirs(LOG_DIR, exist_ok=True)
+
+_file_handler = RotatingFileHandler(
+    filename=LOG_FILE,
+    maxBytes=LOG_MAX_BYTES,
+    backupCount=LOG_BACKUP_COUNT,
+    encoding="utf-8",
+)
+_file_handler.rotator = _gzip_rotator
+_file_handler.namer = _gzip_namer
+
+logging.basicConfig(level=_resolve_log_level(),
                     format='%(asctime)s - %(levelname)s - %(name)s: %(message)s',
+                    handlers=[_file_handler],
                     force=True)
 
 # Recording unhandled exceptions in log file
