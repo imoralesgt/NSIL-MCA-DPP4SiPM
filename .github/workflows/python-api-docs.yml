@@ -1,0 +1,105 @@
+name: Python API docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sw/python-api/**"
+      - ".github/workflows/python-api-docs.yml"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  markdown-docs:
+    if: github.event_name != 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          working-directory: sw/python-api
+
+      - name: Install docs dependencies
+        working-directory: sw/python-api
+        run: uv sync --group docs
+
+      - name: Generate markdown API reference
+        working-directory: sw/python-api
+        run: |
+          uv run --group docs --no-sync lazydocs \
+            --output-path ../../docs/sw/python-api \
+            --src-base-url "https://github.com/${{ github.repository }}/blob/main/" \
+            main core.daq_commands
+        env:
+          PYTHONPATH: .
+
+      - name: Commit updated docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/sw/python-api/main.md docs/sw/python-api/core.daq_commands.md
+          git diff --staged --quiet || git commit -m "docs(python-api): regenerate API reference [skip ci]"
+          git push
+
+  release-pdf:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          working-directory: sw/python-api
+
+      - name: Install docs dependencies
+        working-directory: sw/python-api
+        run: uv sync --group docs
+
+      - name: Generate markdown API reference for this release
+        working-directory: sw/python-api
+        run: |
+          mkdir -p /tmp/api-docs
+          uv run --group docs --no-sync lazydocs \
+            --output-path /tmp/api-docs \
+            --src-base-url "https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/" \
+            main core.daq_commands
+        env:
+          PYTHONPATH: .
+
+      - name: Install pandoc and weasyprint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 fonts-liberation
+          python3 -m pip install --break-system-packages --quiet weasyprint
+
+      - name: Build combined PDF
+        run: |
+          cat > /tmp/api-docs/00-title.md <<EOF
+          ---
+          title: "DPP4SiPM Python API Documentation"
+          subtitle: "${{ github.ref_name }}"
+          date: "$(date -u +%Y-%m-%d)"
+          ---
+          EOF
+          pandoc \
+            /tmp/api-docs/00-title.md \
+            docs/sw/python-api/README.md \
+            /tmp/api-docs/main.md \
+            /tmp/api-docs/core.daq_commands.md \
+            --pdf-engine=weasyprint \
+            --toc \
+            -o /tmp/DPP4SiPM_Python_API_${{ github.ref_name }}.pdf
+
+      - name: Upload PDF to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "/tmp/DPP4SiPM_Python_API_${{ github.ref_name }}.pdf" \
+            --repo "${{ github.repository }}" \
+            --clobber
