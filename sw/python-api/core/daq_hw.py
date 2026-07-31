@@ -60,15 +60,29 @@ class DaqHw(Serial):
     def _disregard_jtag(self):
         """Finds and filters UART-only ports while ignoring JTAG channels.
 
-        Scans the `/dev/serial/by-id/` directory for interfaces associated 
-        with `/dev/ttyUSB` or `/dev/ttyACM` devices, disregarding any 
+        Dispatches to an OS-specific discovery method, since `/dev/serial/by-id/`
+        (used on Linux) has no equivalent on Windows.
+
+        Returns:
+            list: A sorted list of strings containing the UART-only ports
+            (absolute device paths on Linux, COM port names on Windows).
+        """
+        if self.get_os() == self.OS_WINDOWS:
+            return self.__disregard_jtag_windows()
+        return self.__disregard_jtag_linux()
+
+    def __disregard_jtag_linux(self):
+        """Finds and filters UART-only ports while ignoring JTAG channels (Linux).
+
+        Scans the `/dev/serial/by-id/` directory for interfaces associated
+        with `/dev/ttyUSB` or `/dev/ttyACM` devices, disregarding any
         JTAG instances present on the FTDI chip.
 
         Returns:
-            list: A sorted list of strings containing absolute paths to 
+            list: A sorted list of strings containing absolute paths to
             the UART-only ports.
         """
-        
+
         base_path = "/dev/serial/by-id/"
         uart_ports = []
 
@@ -86,21 +100,44 @@ class DaqHw(Serial):
                 real_path = os.path.realpath(full_path)
                 uart_ports.append(real_path)
 
-        # Returns a list of UART-only ports associated to /dev/ttyUSB or /dev/ttyACM... 
+        # Returns a list of UART-only ports associated to /dev/ttyUSB or /dev/ttyACM...
+        return sorted(uart_ports)
+
+    def __disregard_jtag_windows(self):
+        """Finds and filters UART-only ports while ignoring JTAG channels (Windows).
+
+        Windows has no `/dev/serial/by-id/` equivalent, so channels are told
+        apart via the FTDI chip's per-channel USB serial number instead: the
+        JTAG channel's serial number ends in 'A' and the UART channel's ends
+        in 'B' (see `retrieve_serial`).
+
+        Returns:
+            list: A sorted list of strings containing the COM port names of
+            the UART-only ports.
+        """
+        uart_ports = []
+
+        for port in list_ports.comports():
+            serial_number = str(port.serial_number or "").upper()
+            if serial_number.endswith("B"):
+                uart_ports.append(port.device)
+
         return sorted(uart_ports)
 
     def __set_os(self):
-        """Determines the current operating system based on the `platform`.
-        Sets it to the private attribute `__os`.
+        """Determines the current operating system based on the `platform` module.
+
+        Returns:
+            str: One of `OS_WINDOWS`, `OS_LINUX`, `OS_MAC`, or `OS_UNKNOWN`.
         """
         if platform == "win32" or platform == "cygwin":
-            self.__os = self.OS_WINDOWS
+            return self.OS_WINDOWS
         elif platform == "linux":
-            self.__os = self.OS_LINUX
+            return self.OS_LINUX
         elif platform == "darwin":
-            self.__os = self.MAC
+            return self.OS_MAC
         else:
-            self.__os = self.OS_UNKNOWN
+            return self.OS_UNKNOWN
 
     def get_os(self):
         """Returns the current operating system."""
