@@ -12,3 +12,8 @@ dependencies = [
     "pytest>=9.0.3",
     "tqdm>=4.68.2",
 ]
+
+[dependency-groups]
+docs = [
+    "lazydocs>=0.4.8",
+]
