@@ -21,7 +21,7 @@ flowchart TD
     DET[SiPM detector] -->|analog pulse| FE["Analog front-end<br/>TIA + VGA gain"]
     FE -->|ADC| FMT
 
-    subgraph DPP["FPGA DPP chain (Artix-7 fabric)"]
+    subgraph FPGA["FPGA fabric (Artix-7)"]
         direction TB
         FMT["Formatter<br/>smoothing / invert / DC offset"] --> SHS["Shaper - slow"]
         FMT --> SHF["Shaper - fast"]
@@ -31,13 +31,13 @@ flowchart TD
         BLRF --> PKF["Peak Detector - fast"]
         PKS --> PUR["Pile-up Rejector"]
         PKF --> PUR
+
+        PUR --> MCA[("MCA histogram<br/>BRAM, 2048 ch")]
+        FMT -.->|scope_mux taps| SCOPE[("Oscilloscope<br/>BRAM, 2048 samples/ch")]
+
+        MCA --> MB["MicroBlaze soft-processor<br/>ASCII command interpreter + I2C DAC control"]
+        SCOPE --> MB
     end
-
-    PUR --> MCA[("MCA histogram<br/>BRAM, 2048 ch")]
-    DPP -.->|scope_mux taps| SCOPE[("Oscilloscope buffer<br/>BRAM, 2048 samples/ch")]
-
-    MCA --> MB["MicroBlaze soft-processor<br/>ASCII command interpreter + I2C DAC control"]
-    SCOPE --> MB
 
     MB --> FTDI{"FTDI dual UART/JTAG bridge<br/>VID:PID 0403:6010"}
     FTDI -->|Channel A| JTAG["JTAG - programming/debug"]
